@@ -86,4 +86,4 @@ Build a more transparent and data-driven interface for crypto yield investing.
 
 ## Author
 
-Wonjae Choi
+Noah
