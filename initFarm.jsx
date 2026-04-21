@@ -27,54 +27,54 @@ const T = {
 const Icons = {
   verify: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      <path d="m9 12 2 2 4-4"/>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
     </svg>
   ),
   chart: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18"/>
-      <path d="m19 9-5 5-4-4-3 3"/>
+      <path d="M3 3v18h18" />
+      <path d="m19 9-5 5-4-4-3 3" />
     </svg>
   ),
   bot: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="10" rx="2"/>
-      <circle cx="12" cy="5" r="2"/>
-      <path d="M12 7v4"/>
-      <line x1="8" y1="16" x2="8" y2="16"/>
-      <line x1="16" y1="16" x2="16" y2="16"/>
+      <rect x="3" y="11" width="18" height="10" rx="2" />
+      <circle cx="12" cy="5" r="2" />
+      <path d="M12 7v4" />
+      <line x1="8" y1="16" x2="8" y2="16" />
+      <line x1="16" y1="16" x2="16" y2="16" />
     </svg>
   ),
   monitor: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20v-6"/>
-      <path d="M12 14a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/>
-      <path d="M12 10V6"/>
-      <path d="M12 6l3 3"/>
-      <circle cx="12" cy="20" r="2"/>
+      <path d="M12 20v-6" />
+      <path d="M12 14a7 7 0 1 0 0-14 7 7 0 0 0 0 14z" />
+      <path d="M12 10V6" />
+      <path d="M12 6l3 3" />
+      <circle cx="12" cy="20" r="2" />
     </svg>
   ),
   arrow: (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 8h10m-4-4 4 4-4 4"/>
+      <path d="M3 8h10m-4-4 4 4-4 4" />
     </svg>
   ),
   send: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
     </svg>
   ),
   close: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M18 6 6 18M6 6l12 12"/>
+      <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   ),
   wallet: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
     </svg>
   ),
 };
@@ -210,9 +210,9 @@ function WalletPanel({ onClose }) {
                         width: 20, height: 20, border: `2px solid ${T.cardBorder}`,
                         borderTopColor: T.text, borderRadius: "50%",
                         animation: "spin 0.8s linear infinite",
-                      }}/>
+                      }} />
                     ) : (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4" /></svg>
                     )}
                   </button>
                 ))}
@@ -398,7 +398,7 @@ function Hero({ onDemo, onWallet }) {
         position: "absolute", inset: 0, opacity: 0.4,
         backgroundImage: "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
         backgroundSize: "64px 64px",
-      }}/>
+      }} />
       <div style={{ position: "relative", zIndex: 1, maxWidth: 720 }}>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 8,
@@ -418,7 +418,7 @@ function Hero({ onDemo, onWallet }) {
           fontSize: 60, fontWeight: 600, lineHeight: 1.1,
           color: T.text, letterSpacing: "-2px", margin: "0 0 24px",
           fontFamily: "'Inter', sans-serif",
-        }}>Smarter yield,<br/>verified on-chain</h1>
+        }}>Smarter yield,<br />verified on-chain</h1>
         <p style={{
           fontSize: 18, color: T.textSoft, lineHeight: 1.7,
           margin: "0 auto 48px", maxWidth: 520, fontWeight: 400,
@@ -591,8 +591,8 @@ function PoolTable() {
       background: `linear-gradient(180deg, #EDE8E0 0%, #E8E3DA 60%, ${T.bgWarm} 100%)`,
     }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        <div style={{ position: "absolute", top: "10%", left: "8%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)", filter: "blur(40px)" }}/>
-        <div style={{ position: "absolute", top: "50%", right: "5%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)", filter: "blur(50px)" }}/>
+        <div style={{ position: "absolute", top: "10%", left: "8%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%)", filter: "blur(40px)" }} />
+        <div style={{ position: "absolute", top: "50%", right: "5%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)", filter: "blur(50px)" }} />
       </div>
       <div style={{ maxWidth: 1120, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 32, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -715,28 +715,198 @@ function PoolTable() {
 }
 /* ─── Process ─── */
 function Process() {
+  const sectionRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
   const steps = [
-    { n: "01", t: "Collect", d: "Pull real-time TVL, fee revenue, token distribution, and staking flow data from on-chain sources including DeFiLlama, Dune Analytics, and StakingRewards." },
-    { n: "02", t: "Decompose", d: "Break each protocol's yield into primitives \u2014 rebase, reward distribution, fee sharing, lending interest, and AUM performance \u2014 then compute an independent APY." },
-    { n: "03", t: "Quantify", d: "Calculate Risk(\u03b4) = Nominal APY \u2212 Own APY to measure the risk premium. Score every protocol across all six risk parameters with weighted analysis." },
-    { n: "04", t: "Construct", d: "The AI agent assembles a portfolio matching your investment policy \u2014 balancing target yields with acceptable risk levels and lock-up preferences." },
+    {
+      n: "01", t: "Collect",
+      d: "Pull real-time TVL, fee revenue, token distribution, and staking flow data from on-chain sources including DeFiLlama, Dune Analytics, and StakingRewards.",
+      detail: "Real-time feeds from 12+ data providers",
+    },
+    {
+      n: "02", t: "Decompose",
+      d: "Break each protocol\u2019s yield into primitives \u2014 rebase, reward distribution, fee sharing, lending interest, and AUM performance \u2014 then compute an independent APY.",
+      detail: "5 yield primitives analyzed per protocol",
+    },
+    {
+      n: "03", t: "Quantify",
+      d: "Calculate Risk(\u03b4) = Nominal APY \u2212 Own APY to measure the risk premium. Score every protocol across all six risk parameters with weighted analysis.",
+      detail: "6-factor weighted risk scoring",
+    },
+    {
+      n: "04", t: "Construct",
+      d: "The AI agent assembles a portfolio matching your investment policy \u2014 balancing target yields with acceptable risk levels and lock-up preferences.",
+      detail: "Personalized to your risk tolerance",
+    },
   ];
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        if (!sectionRef.current) { ticking = false; return; }
+        const rect = sectionRef.current.getBoundingClientRect();
+        const sectionH = sectionRef.current.offsetHeight;
+        const viewH = window.innerHeight;
+        const scrollStart = -rect.top;
+        const scrollRange = sectionH - viewH;
+        const p = Math.max(0, Math.min(1, scrollStart / scrollRange));
+        setScrollProgress(p);
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const totalSteps = steps.length;
+  const raw = scrollProgress * totalSteps;
+  const activeIndex = Math.min(totalSteps - 1, Math.floor(raw));
+  const stepFraction = raw - activeIndex;
+
+  const getCardStyle = (i) => {
+    const isActive = i === activeIndex;
+    const isPast = i < activeIndex;
+    const isFuture = i > activeIndex;
+
+    let yOffset = 0;
+    let scale = 1;
+    let opacity = 0;
+    let rotate = 0;
+    let zIndex = i;
+
+    if (isFuture) {
+      if (i === activeIndex + 1) {
+        const peekProgress = Math.max(0, stepFraction - 0.5) * 2;
+        opacity = peekProgress * 0.3;
+        yOffset = 80 - peekProgress * 20;
+        scale = 0.9 + peekProgress * 0.02;
+        rotate = 2.5 - peekProgress * 0.5;
+      } else {
+        opacity = 0;
+        yOffset = 100;
+        scale = 0.88;
+        rotate = 3;
+      }
+    } else if (isActive) {
+      const enter = Math.min(1, scrollProgress < 0.01 && i === 0 ? 0 : 1);
+      opacity = i === 0 ? (scrollProgress < 0.02 ? scrollProgress * 50 : 1) : 1;
+      yOffset = 0;
+      scale = 1;
+      rotate = 0;
+      zIndex = 10;
+      if (stepFraction > 0.6) {
+        const exitProgress = (stepFraction - 0.6) / 0.4;
+        yOffset = -20 * exitProgress;
+        scale = 1 - 0.03 * exitProgress;
+        opacity = 1 - 0.3 * exitProgress;
+        rotate = -0.5 * exitProgress;
+      }
+    } else if (isPast) {
+      const distance = activeIndex - i;
+      opacity = Math.max(0.08, 0.4 - distance * 0.15);
+      yOffset = -20 - 14 * distance;
+      scale = 0.97 - distance * 0.03;
+      rotate = -0.5 - 0.5 * distance;
+      zIndex = 4 - distance;
+    }
+
+    return {
+      position: "absolute",
+      left: 0, right: 0,
+      transform: `translateY(${yOffset}px) scale(${scale}) rotate(${rotate}deg)`,
+      opacity,
+      zIndex,
+      transition: "transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease",
+      pointerEvents: isActive ? "auto" : "none",
+    };
+  };
+
   return (
-    <section id="process" style={{ padding: "120px 48px", background: T.bgDark, color: "#fff" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ marginBottom: 64 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Process</p>
-          <h2 style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-1px", margin: 0, color: "#fff" }}>From on-chain data to your portfolio</h2>
+    <section id="process" ref={sectionRef} style={{
+      minHeight: "300vh", position: "relative",
+      background: T.bgDark,
+    }}>
+      <div style={{
+        position: "sticky", top: 0, height: "100vh",
+        display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
+        padding: "0 48px", overflow: "hidden",
+      }}>
+        <div style={{ maxWidth: 1120, width: "100%", marginBottom: 48 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Process</p>
+              <h2 style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-1px", margin: 0, color: "#fff" }}>From on-chain data to your portfolio</h2>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {steps.map((_, i) => (
+                <div key={i} style={{
+                  width: i === activeIndex ? 28 : 8, height: 8, borderRadius: 100,
+                  background: i === activeIndex ? "#fff" : "rgba(255,255,255,0.15)",
+                  transition: "all 0.4s cubic-bezier(0.32, 0.72, 0, 1)",
+                }} />
+              ))}
+            </div>
+          </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1 }}>
+
+        <div style={{ maxWidth: 1120, width: "100%", position: "relative", height: 380 }}>
           {steps.map((s, i) => (
-            <div key={i} style={{
-              padding: "36px 28px", background: T.bgDarkCard,
-              borderRadius: i === 0 ? "16px 0 0 16px" : i === 3 ? "0 16px 16px 0" : 0,
-            }}>
-              <div style={{ fontSize: 48, fontWeight: 700, color: "rgba(255,255,255,0.06)", lineHeight: 1, marginBottom: 24, fontFamily: "'Inter', monospace" }}>{s.n}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 600, margin: "0 0 12px", color: "#fff" }}>{s.t}</h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: 0 }}>{s.d}</p>
+            <div key={i} style={getCardStyle(i)}>
+              <div style={{
+                background: "rgba(255,255,255,0.06)",
+                backdropFilter: "blur(40px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(40px) saturate(1.4)",
+                borderRadius: 20,
+                border: "1px solid rgba(255,255,255,0.08)",
+                padding: "48px 52px",
+                display: "flex", gap: 52, alignItems: "flex-start",
+                boxShadow: i === activeIndex
+                  ? "0 24px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)"
+                  : "0 8px 32px rgba(0,0,0,0.2)",
+                minHeight: 280,
+              }}>
+                <div style={{ flexShrink: 0 }}>
+                  <div style={{
+                    fontSize: 96, fontWeight: 700, lineHeight: 1,
+                    color: "rgba(255,255,255,0.04)",
+                    fontFamily: "'Inter', sans-serif",
+                    letterSpacing: "-4px",
+                  }}>{s.n}</div>
+                  <div style={{
+                    marginTop: 16, fontSize: 11, fontWeight: 600,
+                    color: "rgba(255,255,255,0.3)",
+                    textTransform: "uppercase", letterSpacing: "1.5px",
+                  }}>{`Step ${s.n}`}</div>
+                </div>
+
+                <div style={{ flex: 1, paddingTop: 8 }}>
+                  <h3 style={{
+                    fontSize: 28, fontWeight: 600, color: "#fff",
+                    margin: "0 0 16px", letterSpacing: "-0.5px",
+                  }}>{s.t}</h3>
+                  <p style={{
+                    fontSize: 16, color: "rgba(255,255,255,0.5)",
+                    lineHeight: 1.8, margin: "0 0 28px", maxWidth: 540,
+                  }}>{s.d}</p>
+                  <div style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    padding: "8px 16px", borderRadius: 100,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}>
+                    <div style={{
+                      width: 6, height: 6, borderRadius: "50%",
+                      background: T.green,
+                    }} />
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>{s.detail}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -947,9 +1117,6 @@ function Pricing() {
           })}
         </div>
 
-        <p style={{ textAlign: "center", marginTop: 28, fontSize: 13, color: T.textMuted }}>
-          Cancel anytime. No lock-up on your subscription.
-        </p>
       </div>
     </section>
   );
@@ -957,16 +1124,21 @@ function Pricing() {
 /* ─── CTA ─── */
 function CTA({ onDemo }) {
   return (
-    <section style={{ padding: "120px 48px", textAlign: "center", background: T.bg }}>
-      <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 16px" }}>Ready to verify your yield?</h2>
-        <p style={{ fontSize: 16, color: T.textSoft, lineHeight: 1.7, marginBottom: 36 }}>Chat with our AI agent to explore on-chain verified yields and build a risk-adjusted portfolio.</p>
+    <section style={{
+      padding: "120px 48px 140px",
+      background: `linear-gradient(180deg, ${T.bg} 0%, ${T.bgWarm} 50%, #EDE8E0 100%)`,
+      textAlign: "center",
+    }}>
+      <div style={{ maxWidth: 480, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 32, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 14px" }}>Ready to claim your yield?</h2>
+        <p style={{ fontSize: 15, color: T.textMuted, lineHeight: 1.7, margin: "0 0 36px" }}>
+          Chat with our AI agent to explore on-chain verified yields and build a risk-adjusted portfolio.
+        </p>
         <button onClick={onDemo} style={{
-          padding: "16px 40px", borderRadius: 100, border: "none",
+          padding: "14px 36px", borderRadius: 100, border: "none",
           background: T.accent, color: "#fff",
-          fontWeight: 500, fontSize: 16, cursor: "pointer",
+          fontWeight: 500, fontSize: 15, cursor: "pointer",
           display: "inline-flex", alignItems: "center", gap: 8,
-          boxShadow: "0 2px 16px rgba(0,0,0,0.1)",
         }}>Try the Demo {Icons.arrow}</button>
       </div>
     </section>
@@ -1020,7 +1192,7 @@ function TypingDots() {
           <div key={i} style={{
             width: 7, height: 7, borderRadius: "50%", background: T.textMuted,
             animation: `dotPulse 1.4s ${i * 0.16}s infinite ease-in-out`,
-          }}/>
+          }} />
         ))}
       </div>
     </div>
@@ -1073,7 +1245,7 @@ function ChatPanel({ onClose }) {
             <div>
               <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>initFarm Agent</div>
               <div style={{ fontSize: 12, color: T.green, display: "flex", alignItems: "center", gap: 5 }}>
-                <div style={{ width: 5, height: 5, borderRadius: 100, background: T.green }}/>
+                <div style={{ width: 5, height: 5, borderRadius: 100, background: T.green }} />
                 Analyzing on-chain data
               </div>
             </div>
@@ -1086,9 +1258,9 @@ function ChatPanel({ onClose }) {
           }}>{Icons.close}</button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: 24, background: T.bg }}>
-          {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content}/>)}
-          {typing && <TypingDots/>}
-          <div ref={endRef}/>
+          {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}
+          {typing && <TypingDots />}
+          <div ref={endRef} />
         </div>
         {messages.length <= 1 && (
           <div style={{ padding: "0 24px 12px", display: "flex", gap: 8, background: T.bg }}>
