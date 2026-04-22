@@ -113,17 +113,75 @@ function getAIResponse(msg) {
   for (const d of DEMO_RESPONSES) if (l.includes(d.trigger)) return d.response;
   return "I can analyze that for you using live on-chain data.\nCurrent Market Snapshot\n  Total DeFi TVL: $187.3B\n  Avg Staking APY (Top 50): ~13.2%\n  Min recommended lock-up: 7 days\nI can help with:\n  \u2014 Personalized portfolio construction\n  \u2014 Protocol-level risk assessment\n  \u2014 APY verification & sustainability\n  \u2014 Initia ecosystem opportunities\nTry asking about portfolio allocation, risk analysis, or Initia staking.";
 }
+/* ─── Wallet detection helpers ─── */
+function detectWallets() {
+  const results = [];
+  /* MetaMask */
+  const eth = typeof window !== "undefined" && window.ethereum;
+  const hasMM = eth && (eth.isMetaMask || (eth.providers && eth.providers.some(p => p.isMetaMask)));
+  results.push({
+    ...WALLETS[0],
+    installed: !!hasMM,
+    async connect() {
+      const provider = eth.providers ? eth.providers.find(p => p.isMetaMask) : eth;
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      return accounts[0];
+    },
+  });
+  /* Phantom */
+  const phantom = typeof window !== "undefined" && (window.phantom?.solana || window.solana);
+  const hasPH = phantom && phantom.isPhantom;
+  results.push({
+    ...WALLETS[1],
+    installed: !!hasPH,
+    async connect() {
+      const resp = await phantom.connect();
+      return resp.publicKey.toString();
+    },
+  });
+  return results;
+}
+function shortenAddr(addr) {
+  if (!addr) return "";
+  if (addr.length > 20) return addr.slice(0, 6) + "\u2026" + addr.slice(-4);
+  return addr;
+}
 /* ─── Connect Wallet Side Panel ─── */
 function WalletPanel({ onClose }) {
+  const [wallets, setWallets] = useState([]);
   const [connecting, setConnecting] = useState(null);
   const [connected, setConnected] = useState(null);
-  const handleConnect = (walletName) => {
-    setConnecting(walletName);
-    setTimeout(() => {
+  const [address, setAddress] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => { setWallets(detectWallets()); }, []);
+
+  const handleConnect = async (w) => {
+    if (!w.installed) {
+      /* Open install page */
+      const urls = { MetaMask: "https://metamask.io/download/", Phantom: "https://phantom.app/download" };
+      window.open(urls[w.name] || "#", "_blank");
+      return;
+    }
+    setConnecting(w.name);
+    setError(null);
+    try {
+      const addr = await w.connect();
+      setAddress(addr);
+      setConnected(w.name);
+    } catch (err) {
+      setError(err.code === 4001 ? "Connection rejected by user." : (err.message || "Connection failed."));
+    } finally {
       setConnecting(null);
-      setConnected(walletName);
-    }, 1800);
+    }
   };
+
+  const handleDisconnect = () => {
+    setConnected(null);
+    setAddress(null);
+    setError(null);
+  };
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 200,
@@ -171,8 +229,9 @@ function WalletPanel({ onClose }) {
                 fontFamily: "'SF Mono', 'Fira Code', monospace",
                 background: T.bgWarm, padding: "8px 14px", borderRadius: 8,
                 display: "inline-block", marginTop: 8,
-              }}>0x7a3F...e92B</p>
-              <button onClick={() => { setConnected(null); }} style={{
+                wordBreak: "break-all",
+              }}>{shortenAddr(address)}</p>
+              <button onClick={handleDisconnect} style={{
                 marginTop: 32, padding: "12px 28px", borderRadius: 100,
                 border: `1px solid ${T.cardBorder}`, background: "transparent",
                 color: T.textSoft, fontSize: 14, fontWeight: 500, cursor: "pointer",
@@ -183,16 +242,17 @@ function WalletPanel({ onClose }) {
             <>
               <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 20, fontWeight: 500, textTransform: "uppercase", letterSpacing: "1px" }}>Choose wallet</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {WALLETS.map((w) => (
-                  <button key={w.name} onClick={() => handleConnect(w.name)} disabled={!!connecting}
+                {wallets.map((w) => (
+                  <button key={w.name} onClick={() => handleConnect(w)} disabled={!!connecting}
                     style={{
                       display: "flex", alignItems: "center", gap: 16,
                       padding: "18px 20px", borderRadius: 16,
-                      border: `1px solid ${T.cardBorder}`,
+                      border: `1px solid ${connecting === w.name ? "rgba(0,0,0,0.12)" : T.cardBorder}`,
                       background: connecting === w.name ? T.bgWarm : T.card,
                       cursor: connecting ? "default" : "pointer",
                       transition: "all 0.15s", textAlign: "left", width: "100%",
                       fontFamily: "'Inter', sans-serif",
+                      opacity: !w.installed && !connecting ? 0.7 : 1,
                     }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: 12, background: w.color,
@@ -202,8 +262,23 @@ function WalletPanel({ onClose }) {
                       <span style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>{w.name[0]}</span>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 600, color: T.text }}>{w.name}</div>
-                      <div style={{ fontSize: 12, color: T.textMuted, marginTop: 2 }}>{w.desc}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: T.text }}>{w.name}</span>
+                        {w.installed ? (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
+                            background: T.greenSoft, color: T.green, letterSpacing: "0.5px",
+                          }}>DETECTED</span>
+                        ) : (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
+                            background: "rgba(0,0,0,0.04)", color: T.textMuted, letterSpacing: "0.5px",
+                          }}>NOT INSTALLED</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 12, color: T.textMuted, marginTop: 2 }}>
+                        {w.installed ? w.desc : `Install ${w.name} to connect`}
+                      </div>
                     </div>
                     {connecting === w.name ? (
                       <div style={{
@@ -211,12 +286,26 @@ function WalletPanel({ onClose }) {
                         borderTopColor: T.text, borderRadius: "50%",
                         animation: "spin 0.8s linear infinite",
                       }} />
+                    ) : !w.installed ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
                     ) : (
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4" /></svg>
                     )}
                   </button>
                 ))}
               </div>
+
+              {error && (
+                <div style={{
+                  marginTop: 16, padding: "12px 16px", borderRadius: 12,
+                  background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)",
+                }}>
+                  <p style={{ fontSize: 13, color: "#DC2626", margin: 0 }}>{error}</p>
+                </div>
+              )}
+
               <div style={{
                 marginTop: 32, padding: "16px 20px", borderRadius: 12,
                 background: T.bgWarm, border: `1px solid ${T.cardBorder}`,
@@ -916,207 +1005,237 @@ function Process() {
 }
 /* ─── Pricing ─── */
 function Pricing() {
-  const [hovered, setHovered] = useState(null);
-  const plans = [
-    {
-      name: "Explorer",
-      tag: null,
-      desc: "Get started for free",
-      price: "0",
-      period: "forever",
-      highlight: false,
-      features: [
-        "Pool table with live yield data",
-        "Basic yield verification",
-        "AI chat \u2014 3 messages / day",
-        "Risk grade overview (A\u2013D)",
-        "View-only portfolio mode",
-      ],
-      cta: "Start Free",
-    },
-    {
-      name: "Starter",
-      tag: "Recommended",
-      desc: "For individual DeFi investors",
-      price: "9.90",
-      originalPrice: "19.90",
-      discount: "50% OFF",
-      period: "/mo",
-      highlight: true,
-      features: [
-        "Everything in Explorer",
-        "Unlimited AI chat",
-        "Full 6-Factor Risk Score",
-        "1 active portfolio",
-        "Weekly rebalancing alerts",
-        "Yield decomposition breakdown",
-        "Risk Delta monitoring",
-        "Lock-up schedule optimization",
-      ],
-      cta: "Get Started",
-    },
-    {
-      name: "Pro",
-      tag: "Popular",
-      desc: "Advanced research & multi-portfolio",
-      price: "29",
-      originalPrice: "59",
-      discount: "51% OFF",
-      period: "/mo",
-      highlight: false,
-      features: [
-        "Everything in Starter",
-        "Protocol comparison analysis",
-        "Historical yield backtesting",
-        "Up to 5 portfolios",
-        "Real-time rebalancing signals",
-        "Whale movement alerts",
-        "Custom risk parameter tuning",
-        "Priority support",
-      ],
-      cta: "Get Started",
-    },
-    {
-      name: "Institutional",
-      tag: "Enterprise",
-      desc: "For funds & DAO treasuries",
-      price: "99",
-      originalPrice: "199",
-      discount: "50% OFF",
-      period: "/mo",
-      highlight: false,
-      features: [
-        "Everything in Pro",
-        "API access",
-        "CSV / JSON data export",
-        "Unlimited portfolios",
-        "Custom risk frameworks",
-        "Multi-sig wallet support",
-        "Dedicated account manager",
-        "On-chain audit reports",
-      ],
-      cta: "Contact Sales",
-    },
-  ];
-
-  const CARD_MIN_H = 620;
-
   return (
     <section id="pricing" style={{
       padding: "120px 48px", background: T.bg, position: "relative",
     }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Pricing</p>
-          <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 14px" }}>Choose your plan</h2>
-          <p style={{ fontSize: 14, color: T.textMuted, lineHeight: 1.7, margin: 0 }}>
-            {"All payments are converted as "}
-            <span style={{ fontWeight: 600, color: T.text }}>iUSD</span>
-            {" (Initia stablecoin) to be used as token"}
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ marginBottom: 72 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Fee Structure</p>
+          <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 14px" }}>Aligned with your returns</h2>
+          <p style={{ fontSize: 15, color: T.textSoft, lineHeight: 1.7, margin: 0 }}>
+            {"No subscriptions. We earn only when you earn."}
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, borderRadius: T.radiusLg, overflow: "hidden", background: "rgba(0,0,0,0.04)" }}>
-          {plans.map((plan, i) => {
-            const isHover = hovered === i;
-            return (
-              <div
-                key={plan.name}
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-                style={{
-                  minHeight: CARD_MIN_H,
-                  padding: "32px 28px 28px",
-                  background: plan.highlight
-                    ? (isHover ? "#F0EDE7" : T.bgWarm)
-                    : (isHover ? "rgba(250,250,248,1)" : "rgba(255,255,255,0.95)"),
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "background 0.25s ease",
-                  position: "relative",
-                }}
-              >
-                {plan.tag && (
-                  <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0,
-                    height: 2,
-                    background: plan.highlight ? T.accent : "transparent",
-                  }} />
-                )}
+        {/* ── Fee Cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
+          <div style={{
+            padding: "40px 36px", borderRadius: T.radiusLg,
+            background: T.bgWarm, position: "relative", overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute", top: 0, left: 36, right: 36, height: 1,
+              background: "rgba(0,0,0,0.06)",
+            }} />
+            <p style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 24px" }}>Management Fee</p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 8 }}>
+              <span style={{ fontSize: 56, fontWeight: 600, color: T.text, letterSpacing: "-3px", lineHeight: 1 }}>1.0%</span>
+            </div>
+            <p style={{ fontSize: 14, color: T.textMuted, margin: 0 }}>of AUM per year</p>
+          </div>
 
-                <div style={{ marginBottom: 24 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 600, color: T.text, margin: 0, letterSpacing: "-0.3px" }}>{plan.name}</h3>
-                    {plan.tag && (
-                      <span style={{
-                        fontSize: 10, fontWeight: 600, color: T.textMuted,
-                        textTransform: "uppercase", letterSpacing: "0.5px",
-                        padding: "2px 8px", borderRadius: 100,
-                        border: `1px solid ${T.cardBorder}`,
-                        background: plan.highlight ? "rgba(0,0,0,0.04)" : "transparent",
-                      }}>{plan.tag}</span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: 13, color: T.textMuted, margin: 0 }}>{plan.desc}</p>
-                </div>
-
-                <div style={{ marginBottom: 6 }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
-                    <span style={{ fontSize: 40, fontWeight: 600, color: T.text, letterSpacing: "-2px", lineHeight: 1 }}>
-                      {plan.price === "0" ? "Free" : `$${plan.price}`}
-                    </span>
-                    {plan.period !== "forever" && (
-                      <span style={{ fontSize: 14, color: T.textMuted, fontWeight: 400, marginLeft: 2 }}>{plan.period}</span>
-                    )}
-                  </div>
-                </div>
-
-                {plan.originalPrice ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24, height: 22 }}>
-                    <span style={{ fontSize: 13, color: T.textMuted, textDecoration: "line-through" }}>${plan.originalPrice}</span>
-                    <span style={{
-                      fontSize: 11, fontWeight: 600, color: T.accent,
-                      background: "rgba(0,0,0,0.04)", padding: "2px 8px", borderRadius: 100,
-                    }}>{plan.discount}</span>
-                  </div>
-                ) : (
-                  <div style={{ height: 22, marginBottom: 24 }} />
-                )}
-
-                <div style={{ width: "100%", height: 1, background: "rgba(0,0,0,0.06)", marginBottom: 24 }} />
-
-                <div style={{ flex: 1, marginBottom: 24 }}>
-                  {plan.features.map((item, j) => (
-                    <div key={j} style={{
-                      display: "flex", alignItems: "flex-start", gap: 10,
-                      marginBottom: 12, fontSize: 13, color: T.textSoft, lineHeight: 1.5,
-                    }}>
-                      <span style={{
-                        width: 16, height: 16, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-                        background: "rgba(0,0,0,0.04)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 9, color: T.textMuted, fontWeight: 700,
-                      }}>{"\u2713"}</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button style={{
-                  width: "100%", padding: "13px 0", borderRadius: 10,
-                  fontSize: 13, fontWeight: 600, cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  border: plan.highlight ? "none" : `1px solid ${T.cardBorder}`,
-                  background: plan.highlight ? T.accent : "transparent",
-                  color: plan.highlight ? "#fff" : T.text,
-                }}>
-                  {plan.cta}
-                </button>
-              </div>
-            );
-          })}
+          <div style={{
+            padding: "40px 36px", borderRadius: T.radiusLg,
+            background: T.bgWarm, position: "relative", overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute", top: 0, left: 36, right: 36, height: 1,
+              background: "rgba(0,0,0,0.06)",
+            }} />
+            <p style={{ fontSize: 12, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1px", margin: "0 0 24px" }}>Performance Fee</p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 8 }}>
+              <span style={{ fontSize: 56, fontWeight: 600, color: T.text, letterSpacing: "-3px", lineHeight: 1 }}>10%</span>
+            </div>
+            <p style={{ fontSize: 14, color: T.textMuted, margin: 0 }}>of net profits</p>
+          </div>
         </div>
 
+        {/* ── Flow Visualization ── */}
+        <div style={{
+          padding: "48px 40px 40px", borderRadius: T.radiusLg,
+          border: `1px solid ${T.cardBorder}`, marginBottom: 24,
+          background: `linear-gradient(160deg, ${T.bg} 0%, ${T.bgWarm} 50%, #F0EDE6 100%)`,
+          position: "relative", overflow: "hidden",
+        }}>
+          {/* Decorative grid dots */}
+          <div style={{
+            position: "absolute", inset: 0, opacity: 0.025,
+            backgroundImage: "radial-gradient(circle, #1A1A1A 1px, transparent 1px)",
+            backgroundSize: "20px 20px",
+          }} />
+          {/* Decorative corner accent */}
+          <div style={{
+            position: "absolute", top: -60, right: -60, width: 180, height: 180,
+            borderRadius: "50%", background: "rgba(34,197,94,0.03)",
+          }} />
+
+          {/* Flow title */}
+          <p style={{
+            fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: "uppercase",
+            letterSpacing: "2px", margin: "0 0 32px", textAlign: "center", position: "relative",
+          }}>How It Works</p>
+
+          {(() => {
+            const nodeSize = 56;
+            const nodeRadius = 16;
+            const labelStyle = { fontSize: 12, fontWeight: 600, color: T.text, margin: 0, letterSpacing: "-0.2px" };
+            const subStyle = { fontSize: 10, color: T.textMuted, margin: "3px 0 0", opacity: 0.55, lineHeight: 1.3 };
+            const nodeBase = {
+              width: nodeSize, height: nodeSize, borderRadius: nodeRadius,
+              background: "#fff", border: `1px solid ${T.cardBorder}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0, position: "relative",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 0.5px 1px rgba(0,0,0,0.03)",
+            };
+            const badgeStyle = {
+              position: "absolute", top: -6, right: -6,
+              fontSize: 8, fontWeight: 700, padding: "2px 5px",
+              borderRadius: 6, letterSpacing: "0.5px",
+              lineHeight: 1,
+            };
+
+            /* Connector with label */
+            const Connector = ({ label, green }) => {
+              const c = green ? "rgba(34,197,94,0.3)" : "rgba(0,0,0,0.1)";
+              const cArr = green ? "rgba(34,197,94,0.45)" : "rgba(0,0,0,0.2)";
+              return (
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", minWidth: 28, alignSelf: "center", marginBottom: 44, gap: 0 }}>
+                  {label && <span style={{ fontSize: 8, fontWeight: 600, color: green ? "rgba(34,197,94,0.5)" : "rgba(0,0,0,0.18)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 4 }}>{label}</span>}
+                  <div style={{ width: "100%", display: "flex", alignItems: "center", padding: "0 2px" }}>
+                    <div style={{ flex: 1, height: 1, background: c, position: "relative" }}>
+                      <div style={{ position: "absolute", top: -1, left: 0, right: 0, height: 3, background: c, opacity: 0.15, borderRadius: 2 }} />
+                    </div>
+                    <svg width="7" height="9" viewBox="0 0 7 9" fill="none" style={{ flexShrink: 0, marginLeft: -1 }}>
+                      <path d="M1 1l4 3.5L1 8" stroke={cArr} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              );
+            };
+
+            return (
+              <div style={{ display: "flex", alignItems: "flex-start", position: "relative" }}>
+                {/* Step 1: Pay in Local Currency */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{ ...nodeBase, background: T.bgWarm }}>
+                    {/* Dollar/currency icon */}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="6" width="20" height="12" rx="2"/>
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M2 10h2m16 0h2M2 14h2m16 0h2"/>
+                    </svg>
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={labelStyle}>Pay</p>
+                    <p style={subStyle}>Local Currency</p>
+                  </div>
+                </div>
+
+                <Connector label="auto" />
+
+                {/* Step 2: Convert to iUSD */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{ ...nodeBase, borderRadius: nodeRadius, overflow: "hidden", background: "#222323" }}>
+                    <div style={{ ...badgeStyle, background: "rgba(0,0,0,0.06)", color: T.textMuted }}>AUTO</div>
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMC45Mzc1IiB5PSIwLjkzNzUiIHdpZHRoPSI1OC4xMjUiIGhlaWdodD0iNTguMTI1IiByeD0iMjkuMDYyNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjg3NSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIzMCIgZmlsbD0iIzIyMjMyMyIvPgo8cGF0aCBkPSJNMjAuMzEyMiA5Ljg3NzQ3QzEyLjgzMjkgMTMuNDg1MyA3LjY3MTY5IDIxLjEzOTkgNy42NzE2OSAyOS45OTk5QzcuNjcyMDUgMzguODU5MyAxMi44MzM1IDQ2LjUxMjEgMjAuMzEyMiA1MC4xMjAxVjUyLjI3NjhDMTIuMDc4OSA0OC42OTE4IDYuMjE2MDUgNDAuNjgyOSA1LjczODA5IDMxLjI0ODRMNS43MDY1NCAyOS45OTk5QzUuNzA2NTQgMjAuMDI3NSAxMS43MTc1IDExLjQ2MTIgMjAuMzEyMiA3LjcxODUyVjkuODc3NDdaIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zOS42ODg3IDcuNzIwNzdDNDguMjgyNSAxMS40NjM2IDU0LjI5MiAyMC4wMjc5IDU0LjI5MiAyOS45OTk5TDU0LjI2MDUgMzEuMjQ4NEM1My43ODI1IDQwLjY4MjQgNDcuOTIwOSA0OC42ODkzIDM5LjY4ODcgNTIuMjc0NlY1MC4xMjI0QzQ3LjE2ODEgNDYuNTE0NiA1Mi4zMjg4IDM4Ljg1OTggNTIuMzI5MSAyOS45OTk5QzUyLjMyOTEgMjEuMTM5NSA0Ny4xNjg3IDEzLjQ4MjggMzkuNjg4NyA5Ljg3NTIyVjcuNzIwNzdaIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zNS41NTA2IDIxLjEwMjRDMzMuOTM1IDIwLjM5NTIgMzEuOTgxNCAyMC4yMDcgMzAuMTE2IDIwLjIwNjlIMjkuNzI3M0MyNy40ODcyIDIwLjIwNyAyNS40NDc1IDIwLjUwNDkgMjMuOTM4MyAyMS4zOTM1QzIyLjMzMDMgMjIuMzQwNSAyMS40Mzk0IDIzLjg5MDcgMjEuNDM5MyAyNi4wMjA0VjI2LjE0MjVDMjEuNDM5MyAyNy42MSAyMS44MjA4IDI4Ljk2NTkgMjIuOTk3OCAyOS45MzY0QzI0LjExMTkgMzAuODU0OSAyNS43NjEyIDMxLjI3MTYgMjcuOTA3MSAzMS4zNzJMMjcuOTE0OSAzMS4zNzI5TDMyLjIyNTQgMzEuNTQxOUMzNC4wMzY2IDMxLjYyNyAzNC45Mzc3IDMxLjg1MzQgMzUuMzkwNCAzMi4xNTEyQzM1LjY5MjQgMzIuMzUgMzUuOTAwMiAzMi42NDczIDM1LjkwMDIgMzMuNTQyOFYzMy43NjA2QzM1LjkwMDIgMzQuMzAxNCAzNS43ODQyIDM0LjY4MDEgMzUuNjEyMSAzNC45NTg5QzM1LjQ0IDM1LjIzNzUgMzUuMTY2OSAzNS40ODk0IDM0LjczNjEgMzUuNzA2QzMzLjgyOSAzNi4xNjE5IDMyLjM2NjYgMzYuMzkwNSAzMC4yNjE1IDM2LjM5MDVDMjguODE4MSAzNi4zOTA1IDI3LjQ1ODEgMzYuMjY5MyAyNi4zODY1IDM1LjkwNDJDMjUuMzM1OSAzNS41NDYyIDI0LjY4MDQgMzUuMDAwMSAyNC4zODk0IDM0LjIwMDFMMjQuMTM1NiAzMy41MDM4SDIwLjQ3NDRMMjAuNzg5OCAzNC44MDk0QzIxLjMwMTUgMzYuOTMxMyAyMi43NTk3IDM4LjIwMTcgMjQuNDk5OCAzOC45MTFDMjYuMTk4NyAzOS42MDM1IDI4LjIyMyAzOS43OTI5IDMwLjA5MTYgMzkuNzkyOUgzMC4zNTgyQzMyLjY5NTUgMzkuNzkyOSAzNC45NDM4IDM5LjU0ODEgMzYuNjM0NiAzOC42NTMyQzM3LjUwMiAzOC4xOTQgMzguMjQxIDM3LjU1NDIgMzguNzU1NyAzNi42ODI1QzM5LjI2OTEgMzUuODEyOCAzOS41MjAzIDM0Ljc3ODYgMzkuNTIwMyAzMy41OTA3VjMzLjM3MjlDMzkuNTIwMyAzMS44OTU2IDM5LjE0MDIgMzAuNTM2MiAzNy45NTk4IDI5LjU2NzNDMzYuODQ0NyAyOC42NTIxIDM1LjE5NDggMjguMjQyNyAzMy4wNTI1IDI4LjE0MjVIMzMuMDQ0N0wyOC43MzQyIDI3Ljk3MjZDMjYuOTIyNiAyNy44ODc0IDI2LjAyMTggMjcuNjYxMSAyNS41NjkxIDI3LjM2MzJDMjUuMjY3MSAyNy4xNjQ0IDI1LjA1OTQgMjYuODY3OSAyNS4wNTk0IDI1Ljk3MjZWMjUuODk5M0MyNS4wNTk0IDI1LjQzODcgMjUuMTQ5OCAyNS4xMTc0IDI1LjI4MiAyNC44ODI3QzI1LjQxMTggMjQuNjUyNSAyNS42MTg3IDI0LjQzOTkgMjUuOTYwNyAyNC4yNTE5QzI2LjY5MjMgMjMuODQ5NyAyNy45NDU1IDIzLjYwOTMgMjkuOTIxNyAyMy42MDkzQzMxLjUwMDYgMjMuNjA5MyAzMi43ODUzIDIzLjc1MDEgMzMuNzI3MyAyNC4xMTIyQzM0LjYxNzkgMjQuNDU0NiAzNS4xNDc3IDI0Ljk2NzEgMzUuMzg2NSAyNS43NjU1TDM1LjYxMjEgMjYuNTIwNEgzOS4yNTc2TDM4Ljk4ODEgMjUuMjQ0QzM4LjU0MjcgMjMuMTM1NiAzNy4yMjQ5IDIxLjgzNTQgMzUuNTUwNiAyMS4xMDI0WiIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBkPSJNMzQuODgwNSA4LjY2NDEyQzMzLjEwNTcgOS4wMTI4MiAzMS44MDcxIDEwLjU2NjkgMzEuNzc3MiAxMi40MDk2VjE0LjE5SDI4LjIyNzhWMTIuNDAwNkMyOC4xOTc5IDEwLjU2NzYgMjYuODk3NCA5LjAxMzA0IDI1LjEyMjMgOC42NjQxMlY1LjA1ODM1QzI2Ljk0OTQgNS4yNDQzNCAyOC42NDIyIDYuMTA3NTcgMjkuODYzOSA3LjQ3ODcyTDMwLjAwMTQgNy42Mzg3M0wzMC4xNDExIDcuNDc4NzJDMzEuMzgwNiA2LjEwMzkxIDMzLjA2NiA1LjI0NzY3IDM0Ljg4MDUgNS4wNTgzNVY4LjY2NDEyWiIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBkPSJNMzQuODgwNSA1MS4zMzZDMzMuMTA1OCA1MC45ODczIDMxLjgwNzEgNDkuNDMzMiAzMS43NzczIDQ3LjU5MDVWNDUuODEwMkgyOC4yMjc4VjQ3LjU5OTVDMjguMTk4IDQ5LjQzMjUgMjYuODk3NCA1MC45ODcxIDI1LjEyMjQgNTEuMzM2VjU0Ljk0MThDMjYuOTQ5NSA1NC43NTU4IDI4LjY0MjIgNTMuODkyNiAyOS44NjQgNTIuNTIxNEwzMC4wMDE0IDUyLjM2MTRMMzAuMTQxMiA1Mi41MjE0QzMxLjM4MDYgNTMuODk2MiAzMy4wNjYgNTQuNzUyNSAzNC44ODA1IDU0Ljk0MThWNTEuMzM2WiIgZmlsbD0iI0Y1RjVGNSIvPgo8L3N2Zz4K" alt="iUSD" width={36} height={36} style={{ display: "block" }} />
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={labelStyle}>iUSD</p>
+                    <p style={subStyle}>Converted</p>
+                  </div>
+                </div>
+
+                <Connector label="deposit" />
+
+                {/* Step 3: AUM Custody */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{ ...nodeBase }}>
+                    <div style={{ ...badgeStyle, background: "rgba(0,0,0,0.05)", color: T.textMuted }}>MOVE</div>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="m9 12 2 2 4-4" stroke={T.green} />
+                    </svg>
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={labelStyle}>Custody</p>
+                    <p style={subStyle}>Smart Contract</p>
+                  </div>
+                </div>
+
+                <Connector label="farm" />
+
+                {/* Step 4: Yield */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{ ...nodeBase }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3" stroke={T.green}/>
+                    </svg>
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={labelStyle}>Yield</p>
+                    <p style={subStyle}>AI-Optimized</p>
+                  </div>
+                </div>
+
+                <Connector label="deduct" />
+
+                {/* Step 5: Fees */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{ ...nodeBase }}>
+                    <div style={{ ...badgeStyle, background: "rgba(0,0,0,0.05)", color: T.textMuted }}>1%+10%</div>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+                    </svg>
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={labelStyle}>Fees</p>
+                    <p style={subStyle}>Mgmt + Performance</p>
+                  </div>
+                </div>
+
+                <Connector label="net" green />
+
+                {/* Step 6: Net Returns */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 68 }}>
+                  <div style={{
+                    ...nodeBase,
+                    background: "rgba(34,197,94,0.06)",
+                    border: `1.5px solid rgba(34,197,94,0.2)`,
+                    boxShadow: "0 2px 16px rgba(34,197,94,0.1), 0 1px 3px rgba(34,197,94,0.05)",
+                  }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={T.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <path d="M22 4L12 14.01l-3-3"/>
+                    </svg>
+                  </div>
+                  <div style={{ textAlign: "center", marginTop: 10 }}>
+                    <p style={{ ...labelStyle, color: T.green }}>Returns</p>
+                    <p style={subStyle}>To You</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* ── Bottom Details ── */}
+        <div style={{ display: "flex", gap: 1, borderRadius: T.radius, overflow: "hidden", background: "rgba(0,0,0,0.04)" }}>
+          {[
+            { label: "High-Water Mark", value: "Yes" },
+            { label: "Lock-up", value: "None" },
+            { label: "Settlement", value: "Quarterly" },
+            { label: "Custody", value: "Initia Move" },
+            { label: "Currency", value: "iUSD" },
+          ].map((item) => (
+            <div key={item.label} style={{
+              flex: 1, padding: "20px 12px", background: T.bg, textAlign: "center",
+            }}>
+              <p style={{ fontSize: 10, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.5px", margin: "0 0 8px" }}>{item.label}</p>
+              <p style={{ fontSize: 16, fontWeight: 600, color: T.text, margin: 0, letterSpacing: "-0.3px" }}>{item.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
