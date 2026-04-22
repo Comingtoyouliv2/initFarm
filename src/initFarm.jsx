@@ -652,6 +652,53 @@ const RISK_COLORS = {
   C: { bg: "#FFFBEB", text: "#B45309", border: "#FDE68A" },
   D: { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA" },
 };
+/* ─── Pool Expanded Detail ─── */
+function PoolExpanded({ p, delta }) {
+  const cardBg = "rgba(245,243,238,0.55)";
+  const cardBorder = "1px solid rgba(255,255,255,0.5)";
+  return (
+    <div style={{ padding: "28px 28px 32px", background: "rgba(245,243,238,0.45)", borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
+      <div style={{ display: "flex", gap: 40, alignItems: "flex-start" }}>
+        <div style={{ background: cardBg, borderRadius: 16, border: cardBorder, padding: "20px 16px 12px", flexShrink: 0 }}>
+          <YieldDistChart nominal={p.nominal} real={p.real} stddev={p.stddev} />
+        </div>
+        <div style={{ flex: 1, paddingTop: 4 }}>
+          <h4 style={{ fontSize: 16, fontWeight: 600, color: T.text, margin: "0 0 20px" }}>Yield Probability Breakdown</h4>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ padding: "14px 18px", borderRadius: 12, background: cardBg, border: cardBorder }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>68% Probability</span>
+                <span style={{ fontSize: 12, color: T.green, fontWeight: 500 }}>{`1\u03c3 range`}</span>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.5px" }}>
+                {`${(p.real - p.stddev).toFixed(2)}% \u2014 ${(p.real + p.stddev).toFixed(2)}%`}
+              </div>
+            </div>
+            <div style={{ padding: "14px 18px", borderRadius: 12, background: cardBg, border: cardBorder }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>95% Probability</span>
+                <span style={{ fontSize: 12, color: T.blue, fontWeight: 500 }}>{`2\u03c3 range`}</span>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.5px" }}>
+                {`${(p.real - 2 * p.stddev).toFixed(2)}% \u2014 ${(p.real + 2 * p.stddev).toFixed(2)}%`}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ flex: 1, padding: "14px 18px", borderRadius: 12, background: cardBg, border: cardBorder }}>
+                <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>{`Risk Delta (\u03b4)`}</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: delta > 1 ? T.orange : T.text }}>{delta.toFixed(2)}%</div>
+              </div>
+              <div style={{ flex: 1, padding: "14px 18px", borderRadius: 12, background: cardBg, border: cardBorder }}>
+                <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>Lock-up</div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: T.text }}>{p.lockup}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function PoolTable() {
   const [expanded, setExpanded] = useState(null);
   const [sortCol, setSortCol] = useState("tvl");
@@ -752,53 +799,210 @@ function PoolTable() {
                     }}>{p.risk} <span style={{ fontWeight: 400 }}>{p.riskLabel}</span></span>
                   </div>
                 </div>
-                {isOpen && (
-                  <div style={{ padding: "28px 28px 32px", background: "rgba(245,243,238,0.45)", borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
-                    <div style={{ display: "flex", gap: 40, alignItems: "flex-start" }}>
-                      <div style={{ background: "rgba(245,243,238,0.55)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.5)", padding: "20px 16px 12px", flexShrink: 0 }}>
-                        <YieldDistChart nominal={p.nominal} real={p.real} stddev={p.stddev} />
-                      </div>
-                      <div style={{ flex: 1, paddingTop: 4 }}>
-                        <h4 style={{ fontSize: 16, fontWeight: 600, color: T.text, margin: "0 0 20px" }}>Yield Probability Breakdown</h4>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                          <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,243,238,0.55)", border: "1px solid rgba(255,255,255,0.5)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>68% Probability</span>
-                              <span style={{ fontSize: 12, color: T.green, fontWeight: 500 }}>{`1\u03c3 range`}</span>
-                            </div>
-                            <div style={{ fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.5px" }}>
-                              {`${(p.real - p.stddev).toFixed(2)}% \u2014 ${(p.real + p.stddev).toFixed(2)}%`}
-                            </div>
-                          </div>
-                          <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,243,238,0.55)", border: "1px solid rgba(255,255,255,0.5)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>95% Probability</span>
-                              <span style={{ fontSize: 12, color: T.blue, fontWeight: 500 }}>{`2\u03c3 range`}</span>
-                            </div>
-                            <div style={{ fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.5px" }}>
-                              {`${(p.real - 2 * p.stddev).toFixed(2)}% \u2014 ${(p.real + 2 * p.stddev).toFixed(2)}%`}
-                            </div>
-                          </div>
-                          <div style={{ display: "flex", gap: 12 }}>
-                            <div style={{ flex: 1, padding: "14px 18px", borderRadius: 12, background: "rgba(245,243,238,0.55)", border: "1px solid rgba(255,255,255,0.5)" }}>
-                              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>{`Risk Delta (\u03b4)`}</div>
-                              <div style={{ fontSize: 18, fontWeight: 600, color: delta > 1 ? T.orange : T.text }}>{delta.toFixed(2)}%</div>
-                            </div>
-                            <div style={{ flex: 1, padding: "14px 18px", borderRadius: 12, background: "rgba(245,243,238,0.55)", border: "1px solid rgba(255,255,255,0.5)" }}>
-                              <div style={{ fontSize: 12, color: T.textMuted, marginBottom: 4 }}>Lock-up</div>
-                              <div style={{ fontSize: 18, fontWeight: 600, color: T.text }}>{p.lockup}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {isOpen && <PoolExpanded p={p} delta={delta} />}
               </div>
             );
           })}
         </div>
       </div>
+    </section>
+  );
+}
+/* ─── Yield Comparison Dashboard ─── */
+function YieldComparison() {
+  const [amount, setAmount] = useState(10000);
+  const [years, setYears] = useState(3);
+
+  const strategies = [
+    { name: "Bank Savings", apy: 3.5, color: "#BFBFBF", desc: "High-yield savings account" },
+    { name: "US Treasury", apy: 4.25, color: "#93A3B1", desc: "10Y Treasury bond yield" },
+    { name: "initFarm", apy: 10.0, color: T.green, desc: "AI-optimized DeFi portfolio", highlight: true },
+  ];
+
+  /* Compound growth: P * (1 + r)^t for each month */
+  const months = years * 12;
+  const dataPoints = [];
+  for (let m = 0; m <= months; m++) {
+    const pt = { month: m };
+    strategies.forEach((s) => {
+      pt[s.name] = amount * Math.pow(1 + s.apy / 100 / 12, m);
+    });
+    dataPoints.push(pt);
+  }
+
+  const finalValues = strategies.map((s) => ({
+    ...s,
+    final: amount * Math.pow(1 + s.apy / 100 / 12, months),
+    gain: amount * Math.pow(1 + s.apy / 100 / 12, months) - amount,
+  }));
+
+  const maxVal = Math.max(...finalValues.map((v) => v.final));
+  const fmt = (n) => n >= 1000 ? "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 }) : "$" + n.toFixed(2);
+
+  /* Chart dimensions */
+  const W = 720, H = 300, padL = 60, padR = 80, padT = 20, padB = 36;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const yMax = maxVal * 1.08;
+  const yMin = amount * 0.98;
+  const toX = (m) => padL + (m / months) * chartW;
+  const toY = (v) => padT + chartH - ((v - yMin) / (yMax - yMin)) * chartH;
+
+  /* Y-axis gridlines */
+  const yTicks = [];
+  const step = Math.pow(10, Math.floor(Math.log10((yMax - yMin) / 4)));
+  const niceStep = step * (Math.ceil((yMax - yMin) / 4 / step));
+  for (let v = Math.ceil(yMin / niceStep) * niceStep; v <= yMax; v += niceStep) {
+    yTicks.push(v);
+  }
+
+  /* X-axis labels */
+  const xLabels = [];
+  const yearStep = years <= 3 ? 1 : years <= 7 ? 2 : 5;
+  for (let y = 0; y <= years; y += yearStep) xLabels.push(y);
+
+  const sliderStyle = {
+    WebkitAppearance: "none", appearance: "none", width: "100%", height: 4,
+    borderRadius: 4, outline: "none", cursor: "pointer",
+  };
+
+  return (
+    <section style={{
+      padding: "80px 48px 100px",
+      background: `linear-gradient(180deg, ${T.bgWarm} 0%, #E8E3DA 50%, #EDE8E0 100%)`,
+      position: "relative", overflow: "hidden",
+    }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        <div style={{ position: "absolute", bottom: "10%", left: "15%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)", filter: "blur(50px)" }} />
+      </div>
+      <div style={{ maxWidth: 1120, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div style={{ marginBottom: 40 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Interactive</p>
+          <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: 0 }}>Portfolio growth comparison</h2>
+        </div>
+
+        <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
+          {/* Chart Area */}
+          <div style={{
+            flex: 1,
+            background: "rgba(245,243,238,0.55)", backdropFilter: "blur(24px)",
+            borderRadius: T.radiusLg, border: "1px solid rgba(255,255,255,0.5)",
+            padding: "32px 28px 24px",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)",
+          }}>
+            <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
+              {/* Grid lines */}
+              {yTicks.map((v) => (
+                <g key={v}>
+                  <line x1={padL} y1={toY(v)} x2={W - padR} y2={toY(v)} stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
+                  <text x={padL - 8} y={toY(v) + 4} textAnchor="end" fontSize="10" fill={T.textMuted} fontFamily="Inter, sans-serif">
+                    {v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v.toFixed(0)}
+                  </text>
+                </g>
+              ))}
+              {/* X-axis labels */}
+              {xLabels.map((y) => (
+                <text key={y} x={toX(y * 12)} y={H - 8} textAnchor="middle" fontSize="10" fill={T.textMuted} fontFamily="Inter, sans-serif">
+                  {y === 0 ? "Now" : `${y}y`}
+                </text>
+              ))}
+              {/* Baseline */}
+              <line x1={padL} y1={toY(amount)} x2={W - padR} y2={toY(amount)} stroke="rgba(0,0,0,0.12)" strokeWidth="1" strokeDasharray="4 3" />
+              {/* Lines */}
+              {strategies.map((s) => {
+                const pts = dataPoints.map((d, i) => `${toX(i)},${toY(d[s.name])}`).join(" ");
+                return (
+                  <g key={s.name}>
+                    <polyline points={pts} fill="none" stroke={s.color} strokeWidth={s.highlight ? 2.5 : 1.5} strokeLinejoin="round" opacity={s.highlight ? 1 : 0.6} />
+                    {/* End dot */}
+                    <circle cx={toX(months)} cy={toY(dataPoints[months][s.name])} r={s.highlight ? 4 : 3} fill={s.color} />
+                    {/* End label */}
+                    <text x={toX(months) + 8} y={toY(dataPoints[months][s.name]) + 4} fontSize="10" fontWeight={s.highlight ? 700 : 500} fill={s.color} fontFamily="Inter, sans-serif">
+                      {fmt(dataPoints[months][s.name])}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+
+          {/* Controls + Results */}
+          <div style={{ width: 320, flexShrink: 0 }}>
+            {/* Controls */}
+            <div style={{
+              background: "rgba(255,255,255,0.65)", backdropFilter: "blur(16px)",
+              borderRadius: 20, border: "1px solid rgba(255,255,255,0.6)",
+              padding: "24px", marginBottom: 16,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
+            }}>
+              {/* Amount */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.5px" }}>Initial Deposit</span>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: T.text, letterSpacing: "-0.5px" }}>{fmt(amount)}</span>
+                </div>
+                <input type="range" min={1000} max={100000} step={500} value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  style={{ ...sliderStyle, background: `linear-gradient(90deg, ${T.text} ${((amount - 1000) / 99000) * 100}%, ${T.cardBorder} ${((amount - 1000) / 99000) * 100}%)` }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                  <span style={{ fontSize: 9, color: T.textMuted }}>$1,000</span>
+                  <span style={{ fontSize: 9, color: T.textMuted }}>$100,000</span>
+                </div>
+              </div>
+              {/* Years */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.5px" }}>Time Horizon</span>
+                  <span style={{ fontSize: 20, fontWeight: 700, color: T.text, letterSpacing: "-0.5px" }}>{years}y</span>
+                </div>
+                <input type="range" min={1} max={10} step={1} value={years}
+                  onChange={(e) => setYears(Number(e.target.value))}
+                  style={{ ...sliderStyle, background: `linear-gradient(90deg, ${T.text} ${((years - 1) / 9) * 100}%, ${T.cardBorder} ${((years - 1) / 9) * 100}%)` }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                  <span style={{ fontSize: 9, color: T.textMuted }}>1 year</span>
+                  <span style={{ fontSize: 9, color: T.textMuted }}>10 years</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Results cards */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {finalValues.map((s) => (
+                <div key={s.name} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "14px 16px", borderRadius: 14,
+                  background: s.highlight ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.55)",
+                  border: s.highlight ? "1px solid rgba(34,197,94,0.18)" : "1px solid rgba(255,255,255,0.5)",
+                  backdropFilter: "blur(12px)",
+                }}>
+                  <div style={{
+                    width: 10, height: 10, borderRadius: "50%",
+                    background: s.color, flexShrink: 0,
+                  }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: s.highlight ? 700 : 500, color: s.highlight ? T.green : T.text }}>{s.name}</div>
+                    <div style={{ fontSize: 10, color: T.textMuted, marginTop: 1 }}>{s.desc}</div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: s.highlight ? T.green : T.text, letterSpacing: "-0.3px" }}>{fmt(s.final)}</div>
+                    <div style={{ fontSize: 10, color: s.gain > 0 ? T.green : T.textMuted, fontWeight: 600, marginTop: 1 }}>+{fmt(s.gain)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slider styles */}
+      <style>{`
+        input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; outline: none; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: ${T.text}; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.15); cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: ${T.text}; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.15); cursor: pointer; }
+        input[type="range"]::-moz-range-progress { background: ${T.text}; height: 4px; border-radius: 4px; }
+        input[type="range"]::-moz-range-track { background: ${T.cardBorder}; height: 4px; border-radius: 4px; }
+      `}</style>
     </section>
   );
 }
@@ -1467,6 +1671,7 @@ export default function App() {
       <Navbar onDemo={() => setChat(true)} onWallet={() => setWallet(true)} />
       <Hero onDemo={() => setChat(true)} onWallet={() => setWallet(true)} />
       <PoolTable />
+      <YieldComparison />
       <Features />
       <Process />
       <Pricing />
