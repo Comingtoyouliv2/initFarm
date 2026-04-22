@@ -81,7 +81,7 @@ All payments are converted as **iUSD** (Initia stablecoin) to be used as token.
 - **Frontend**: React (single-component architecture)
 - **Styling**: Inline CSS with design tokens, glassmorphism
 - **Charts**: SVG-based normal distribution rendering
-- **Wallet**: MetaMask, Phantom integration (demo)
+- **Wallet**: InterwovenKit (`@initia/interwovenkit-react`) integration for Initia UX stack
 - **Deployment**: Vercel
 
 ## Project Structure
@@ -99,8 +99,14 @@ All payments are converted as **iUSD** (Initia stablecoin) to be used as token.
 git clone https://github.com/Comingtoyouliv2/Crypto_APY_Portfoliomaker.git
 cd Crypto_APY_Portfoliomaker
 
-# The app is a single React component — import it into your React project
-# or deploy directly via Vercel
+# Install dependencies
+npm install
+
+# (Optional) set your rollup chain id (defaults to initiation-2)
+echo "VITE_APPCHAIN_ID=<your-rollup-chain-id>" >> .env
+
+# Run dev server
+npm run dev
 ```
 
 ## License

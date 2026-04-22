@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 /* ─── Design Tokens ─── */
 const T = {
   bg: "#FAFAF8",
@@ -84,21 +85,6 @@ const Icons = {
     </svg>
   ),
 };
-/* ─── Wallet Logos ─── */
-const WALLETS = [
-  {
-    name: "MetaMask",
-    icon: "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMjkuNC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogOS4wMyBCdWlsZCAwKSAgLS0+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDE0MiAxMzYuODc4IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxNDIgMTM2Ljg3ODsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8cGF0aCBzdHlsZT0iZmlsbDojRkY1QzE2OyIgZD0iTTEzMi42ODIsMTMyLjE5MmwtMzAuNTgzLTkuMTA2bC0yMy4wNjMsMTMuNzg3bC0xNi4wOTItMC4wMDdsLTIzLjA3Ny0xMy43OGwtMzAuNTY5LDkuMTA2TDAsMTAwLjgwMQoJbDkuMjk5LTM0LjgzOUwwLDM2LjUwN0w5LjI5OSwwbDQ3Ljc2NiwyOC41MzhoMjcuODVMMTMyLjY4MiwwbDkuMjk5LDM2LjUwN2wtOS4yOTksMjkuNDU1bDkuMjk5LDM0LjgzOUwxMzIuNjgyLDEzMi4xOTIKCUwxMzIuNjgyLDEzMi4xOTJ6Ii8+Cjwvc3ZnPgo=",
-    desc: "Connect with MetaMask browser extension",
-    color: "#F6851B",
-  },
-  {
-    name: "Phantom",
-    icon: "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMTI4IDEyOCIgZmlsbD0ibm9uZSI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjQUI5RkYyIi8+Cjwvc3ZnPgo=",
-    desc: "Connect with Phantom wallet",
-    color: "#AB9FF2",
-  },
-];
 /* ─── Demo Chat Responses ─── */
 const DEMO_RESPONSES = [
   {
@@ -119,216 +105,13 @@ function getAIResponse(msg) {
   for (const d of DEMO_RESPONSES) if (l.includes(d.trigger)) return d.response;
   return "I can analyze that for you using live on-chain data.\nCurrent Market Snapshot\n  Total DeFi TVL: $187.3B\n  Avg Staking APY (Top 50): ~13.2%\n  Min recommended lock-up: 7 days\nI can help with:\n  \u2014 Personalized portfolio construction\n  \u2014 Protocol-level risk assessment\n  \u2014 APY verification & sustainability\n  \u2014 Initia ecosystem opportunities\nTry asking about portfolio allocation, risk analysis, or Initia staking.";
 }
-/* ─── Wallet detection helpers ─── */
-function detectWallets() {
-  const results = [];
-  /* MetaMask */
-  const eth = typeof window !== "undefined" && window.ethereum;
-  const hasMM = eth && (eth.isMetaMask || (eth.providers && eth.providers.some(p => p.isMetaMask)));
-  results.push({
-    ...WALLETS[0],
-    installed: !!hasMM,
-    async connect() {
-      const provider = eth.providers ? eth.providers.find(p => p.isMetaMask) : eth;
-      const accounts = await provider.request({ method: "eth_requestAccounts" });
-      return accounts[0];
-    },
-  });
-  /* Phantom */
-  const phantom = typeof window !== "undefined" && (window.phantom?.solana || window.solana);
-  const hasPH = phantom && phantom.isPhantom;
-  results.push({
-    ...WALLETS[1],
-    installed: !!hasPH,
-    async connect() {
-      const resp = await phantom.connect();
-      return resp.publicKey.toString();
-    },
-  });
-  return results;
-}
 function shortenAddr(addr) {
   if (!addr) return "";
   if (addr.length > 20) return addr.slice(0, 6) + "\u2026" + addr.slice(-4);
   return addr;
 }
-/* ─── Connect Wallet Side Panel ─── */
-function WalletPanel({ onClose }) {
-  const [wallets, setWallets] = useState([]);
-  const [connecting, setConnecting] = useState(null);
-  const [connected, setConnected] = useState(null);
-  const [address, setAddress] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => { setWallets(detectWallets()); }, []);
-
-  const handleConnect = async (w) => {
-    if (!w.installed) {
-      /* Open install page */
-      const urls = { MetaMask: "https://metamask.io/download/", Phantom: "https://phantom.app/download" };
-      window.open(urls[w.name] || "#", "_blank");
-      return;
-    }
-    setConnecting(w.name);
-    setError(null);
-    try {
-      const addr = await w.connect();
-      setAddress(addr);
-      setConnected(w.name);
-    } catch (err) {
-      setError(err.code === 4001 ? "Connection rejected by user." : (err.message || "Connection failed."));
-    } finally {
-      setConnecting(null);
-    }
-  };
-
-  const handleDisconnect = () => {
-    setConnected(null);
-    setAddress(null);
-    setError(null);
-  };
-
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 200,
-      background: "rgba(26,26,26,0.25)", backdropFilter: "blur(16px)",
-      display: "flex", justifyContent: "flex-end",
-    }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div style={{
-        width: 400, height: "100%",
-        background: T.bg,
-        boxShadow: "-16px 0 48px rgba(0,0,0,0.08)",
-        display: "flex", flexDirection: "column",
-        animation: "slideIn 0.25s ease-out",
-      }}>
-        <div style={{
-          padding: "24px 28px 20px",
-          borderBottom: `1px solid ${T.cardBorder}`,
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-        }}>
-          <div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: T.text, margin: 0 }}>Connect Wallet</h3>
-            <p style={{ fontSize: 13, color: T.textMuted, margin: "4px 0 0" }}>Sign in to access your portfolio</p>
-          </div>
-          <button onClick={onClose} style={{
-            width: 34, height: 34, borderRadius: 10,
-            border: `1px solid ${T.cardBorder}`, background: "transparent",
-            color: T.textMuted, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>{Icons.close}</button>
-        </div>
-        <div style={{ padding: 28, flex: 1 }}>
-          {connected ? (
-            <div style={{ textAlign: "center", paddingTop: 40 }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: 20,
-                background: T.greenSoft, border: `2px solid ${T.greenBorder}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 20px", fontSize: 28,
-              }}>{"\u2713"}</div>
-              <h4 style={{ fontSize: 18, fontWeight: 600, color: T.text, margin: "0 0 8px" }}>Connected</h4>
-              <p style={{ fontSize: 14, color: T.textSoft, margin: "0 0 8px" }}>{connected}</p>
-              <p style={{
-                fontSize: 13, color: T.textMuted,
-                fontFamily: "'SF Mono', 'Fira Code', monospace",
-                background: T.bgWarm, padding: "8px 14px", borderRadius: 8,
-                display: "inline-block", marginTop: 8,
-                wordBreak: "break-all",
-              }}>{shortenAddr(address)}</p>
-              <button onClick={handleDisconnect} style={{
-                marginTop: 32, padding: "12px 28px", borderRadius: 100,
-                border: `1px solid ${T.cardBorder}`, background: "transparent",
-                color: T.textSoft, fontSize: 14, fontWeight: 500, cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
-              }}>Disconnect</button>
-            </div>
-          ) : (
-            <>
-              <p style={{ fontSize: 13, color: T.textMuted, marginBottom: 20, fontWeight: 500, textTransform: "uppercase", letterSpacing: "1px" }}>Choose wallet</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {wallets.map((w) => (
-                  <button key={w.name} onClick={() => handleConnect(w)} disabled={!!connecting}
-                    style={{
-                      display: "flex", alignItems: "center", gap: 16,
-                      padding: "18px 20px", borderRadius: 16,
-                      border: `1px solid ${connecting === w.name ? "rgba(0,0,0,0.12)" : T.cardBorder}`,
-                      background: connecting === w.name ? T.bgWarm : T.card,
-                      cursor: connecting ? "default" : "pointer",
-                      transition: "all 0.15s", textAlign: "left", width: "100%",
-                      fontFamily: "'Inter', sans-serif",
-                      opacity: !w.installed && !connecting ? 0.7 : 1,
-                    }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 12, background: w.color,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      overflow: "hidden", flexShrink: 0,
-                    }}>
-                      <span style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>{w.name[0]}</span>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 15, fontWeight: 600, color: T.text }}>{w.name}</span>
-                        {w.installed ? (
-                          <span style={{
-                            fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
-                            background: T.greenSoft, color: T.green, letterSpacing: "0.5px",
-                          }}>DETECTED</span>
-                        ) : (
-                          <span style={{
-                            fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
-                            background: "rgba(0,0,0,0.04)", color: T.textMuted, letterSpacing: "0.5px",
-                          }}>NOT INSTALLED</span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: 12, color: T.textMuted, marginTop: 2 }}>
-                        {w.installed ? w.desc : `Install ${w.name} to connect`}
-                      </div>
-                    </div>
-                    {connecting === w.name ? (
-                      <div style={{
-                        width: 20, height: 20, border: `2px solid ${T.cardBorder}`,
-                        borderTopColor: T.text, borderRadius: "50%",
-                        animation: "spin 0.8s linear infinite",
-                      }} />
-                    ) : !w.installed ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={T.textMuted} strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4" /></svg>
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {error && (
-                <div style={{
-                  marginTop: 16, padding: "12px 16px", borderRadius: 12,
-                  background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.12)",
-                }}>
-                  <p style={{ fontSize: 13, color: "#DC2626", margin: 0 }}>{error}</p>
-                </div>
-              )}
-
-              <div style={{
-                marginTop: 32, padding: "16px 20px", borderRadius: 12,
-                background: T.bgWarm, border: `1px solid ${T.cardBorder}`,
-              }}>
-                <p style={{ fontSize: 13, color: T.textSoft, lineHeight: 1.6, margin: 0 }}>
-                  By connecting your wallet, you agree to our Terms of Service and acknowledge that you have read our Privacy Policy.
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 /* ─── Navbar ─── */
-function Navbar({ onDemo, onWallet }) {
+function Navbar({ onDemo, onWallet, onBridge, walletLabel }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     let ticking = false;
@@ -391,6 +174,16 @@ function Navbar({ onDemo, onWallet }) {
               transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
               boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             }}>Try Demo</button>
+            <button onClick={onBridge} className="nav-btn-secondary" style={{
+              padding: "9px 18px", borderRadius: 100,
+              border: "1px solid rgba(0,0,0,0.08)",
+              background: "rgba(245,243,238,0.5)",
+              color: T.text, fontWeight: 500, fontSize: 14,
+              cursor: "pointer", fontFamily: "inherit",
+              display: "flex", alignItems: "center", gap: 6,
+              transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}>Bridge</button>
             <button onClick={onWallet} className="nav-btn-secondary" style={{
               padding: "9px 18px", borderRadius: 100,
               border: "1px solid rgba(0,0,0,0.08)",
@@ -400,7 +193,7 @@ function Navbar({ onDemo, onWallet }) {
               display: "flex", alignItems: "center", gap: 6,
               transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
               boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-            }}>{Icons.wallet} Connect</button>
+            }}>{Icons.wallet} {walletLabel}</button>
           </div>
         </div>
       </nav>
@@ -464,6 +257,16 @@ function Navbar({ onDemo, onWallet }) {
               transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
               boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             }}>Try Demo</button>
+            <button onClick={onBridge} className="pill-btn-wallet" style={{
+              padding: "7px 14px", borderRadius: 100,
+              border: "1px solid rgba(0,0,0,0.06)",
+              background: "rgba(245,243,238,0.6)",
+              color: T.text, fontWeight: 500, fontSize: 13,
+              cursor: "pointer", fontFamily: "inherit",
+              display: "flex", alignItems: "center", gap: 5,
+              whiteSpace: "nowrap",
+              transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+            }}>Bridge</button>
             <button onClick={onWallet} className="pill-btn-wallet" style={{
               padding: "7px 14px", borderRadius: 100,
               border: "1px solid rgba(0,0,0,0.06)",
@@ -473,7 +276,7 @@ function Navbar({ onDemo, onWallet }) {
               display: "flex", alignItems: "center", gap: 5,
               whiteSpace: "nowrap",
               transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
-            }}>{Icons.wallet} Connect</button>
+            }}>{Icons.wallet} {walletLabel}</button>
           </div>
         </div>
       </div>
@@ -481,7 +284,7 @@ function Navbar({ onDemo, onWallet }) {
   );
 }
 /* ─── Hero ─── */
-function Hero({ onDemo, onWallet }) {
+function Hero({ onDemo, onWallet, walletLabel }) {
   return (
     <section style={{
       display: "flex", flexDirection: "column",
@@ -534,7 +337,7 @@ function Hero({ onDemo, onWallet }) {
             color: T.text, fontWeight: 500, fontSize: 15, cursor: "pointer",
             display: "flex", alignItems: "center", gap: 8,
             boxShadow: "0 2px 12px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
-          }}>{Icons.wallet} Connect Wallet</button>
+          }}>{Icons.wallet} {walletLabel}</button>
         </div>
       </div>
     </section>
@@ -1471,7 +1274,7 @@ function Pricing() {
 function CTA({ onDemo }) {
   return (
     <section style={{
-      padding: "120px 48px 140px",
+      padding: "120px 48px 88px",
       background: `linear-gradient(180deg, ${T.bg} 0%, ${T.bgWarm} 50%, #EDE8E0 100%)`,
       textAlign: "center",
     }}>
@@ -1494,11 +1297,86 @@ function CTA({ onDemo }) {
 function Footer() {
   return (
     <footer style={{
-      padding: "32px 48px", borderTop: "1px solid rgba(0,0,0,0.06)",
-      display: "flex", justifyContent: "space-between", alignItems: "center", background: T.bg,
+      padding: "44px 48px 56px",
+      background: "#EDE8E0",
+      position: "relative",
+      overflow: "hidden",
+      borderTop: "1px solid rgba(0,0,0,0.04)",
     }}>
-      <span style={{ fontSize: 15, fontWeight: 600, color: T.text, letterSpacing: "-0.3px" }}>init<span style={{ fontWeight: 300 }}>Farm</span></span>
-      <span style={{ fontSize: 13, color: T.textMuted }}>Initia Hackathon {new Date().getFullYear()}</span>
+      <div style={{
+        maxWidth: 1120, margin: "0 auto", width: "100%",
+        display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+        gap: 32, position: "relative", zIndex: 2,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 12, background: T.text,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontSize: 12, fontWeight: 700,
+          }}>iF</div>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 650, color: T.text, letterSpacing: "-0.4px" }}>
+              init<span style={{ fontWeight: 300 }}>Farm</span>
+            </div>
+            <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2, textTransform: "uppercase", letterSpacing: "0.8px" }}>
+              Initia-native yield engine
+            </div>
+          </div>
+        </div>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(110px, 1fr))",
+          gap: 24,
+          maxWidth: 560,
+          width: "100%",
+        }}>
+          {[
+            { title: "Product", links: ["Features", "Pools", "Pricing"] },
+            { title: "Resources", links: ["Docs", "GitHub", "Demo"] },
+            { title: "Navigate", links: ["Back to top", "Try Demo", "Bridge"] },
+          ].map((g) => (
+            <div key={g.title}>
+              <p style={{
+                fontSize: 10, color: T.textMuted, margin: "0 0 12px",
+                textTransform: "uppercase", letterSpacing: "1px", fontWeight: 600,
+              }}>{g.title}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {g.links.map((l) => (
+                  <a key={l} href={l === "Back to top" ? "#" : undefined} style={{
+                    fontSize: 13, color: T.textSoft, textDecoration: "none", fontWeight: 500,
+                  }}>{l}</a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        position: "absolute",
+        left: "50%",
+        transform: "translateX(-50%)",
+        bottom: -22,
+        fontSize: "clamp(56px, 16vw, 180px)",
+        fontWeight: 700,
+        letterSpacing: "-3px",
+        color: "rgba(255,255,255,0.38)",
+        whiteSpace: "nowrap",
+        pointerEvents: "none",
+        userSelect: "none",
+      }}>
+        INITFARM
+      </div>
+
+      <div style={{
+        position: "absolute", left: 48, right: 48, bottom: 14,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        zIndex: 2,
+      }}>
+        <span style={{ fontSize: 12, color: T.textMuted }}>Built for Initia Hackathon {new Date().getFullYear()}</span>
+        <span style={{ fontSize: 12, color: T.textMuted }}>On-chain verified yields</span>
+      </div>
     </footer>
   );
 }
@@ -1712,7 +1590,17 @@ function ChatPanel({ onClose }) {
 /* ─── App ─── */
 export default function App() {
   const [chat, setChat] = useState(false);
-  const [wallet, setWallet] = useState(false);
+  const { isConnected, address, username, openConnect, openWallet, openBridge } = useInterwovenKit();
+
+  const handleWalletClick = () => {
+    if (isConnected) openWallet();
+    else openConnect();
+  };
+
+  const walletLabel = isConnected
+    ? (username || shortenAddr(address) || "Wallet")
+    : "Connect";
+
   return (
     <div style={{ background: T.bg, minHeight: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <style>{`
@@ -1746,8 +1634,17 @@ export default function App() {
         .pill-btn-primary:hover { background: #333 !important; transform: translateY(-0.5px); box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important; }
         .pill-btn-wallet:hover { background: rgba(245,243,238,0.9) !important; border-color: rgba(0,0,0,0.1) !important; }
       `}</style>
-      <Navbar onDemo={() => setChat(true)} onWallet={() => setWallet(true)} />
-      <Hero onDemo={() => setChat(true)} onWallet={() => setWallet(true)} />
+      <Navbar
+        onDemo={() => setChat(true)}
+        onWallet={handleWalletClick}
+        onBridge={() => openBridge()}
+        walletLabel={walletLabel}
+      />
+      <Hero
+        onDemo={() => setChat(true)}
+        onWallet={handleWalletClick}
+        walletLabel={walletLabel}
+      />
       <PoolTable />
       <YieldComparison />
       <Features />
@@ -1756,7 +1653,6 @@ export default function App() {
       <CTA onDemo={() => setChat(true)} />
       <Footer />
       {chat && <ChatPanel onClose={() => setChat(false)} />}
-      {wallet && <WalletPanel onClose={() => setWallet(false)} />}
     </div>
   );
 }
