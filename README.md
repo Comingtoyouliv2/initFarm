@@ -109,4 +109,4 @@ MIT
 
 ---
 
-Built for the **Initia Hackathon 2025**
+Built for the **Initia Hackathon 2026**
