@@ -70,6 +70,12 @@ const Icons = {
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   ),
+  token: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/>
+    </svg>
+  ),
   wallet: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
@@ -101,7 +107,7 @@ const DEMO_RESPONSES = [
   },
   {
     trigger: "risk",
-    response: "Risk Assessment \u2014 6-Factor Analysis\n1. TVL \u2014 $2.4B locked, trending +12% (30d)\n   Herfindahl Index: 0.08, Whale Risk: 3.2%\n2. APY Stability \u2014 90d volatility \u03c3 = 2.1%\n   Coverage Ratio: 0.72 (revenue-backed)\n3. Token Price \u2014 30d: +8.4%, 90d: +22.1%\n   Daily \u03c3: 3.8%\n4. Lock-up \u2014 14 days, Risk Score: 4/10\nRisk Delta\n  Risk(\u03b4) = 14.2% \u2212 11.8% = 2.4%\n  This gap is the risk premium in the advertised rate.",
+    response: "Risk Assessment \u2014 Multi-Factor Analysis\n1. TVL \u2014 $2.4B locked, trending +12% (30d)\n   Herfindahl Index: 0.08, Whale Risk: 3.2%\n2. APY Stability \u2014 90d volatility \u03c3 = 2.1%\n   Coverage Ratio: 0.72 (revenue-backed)\n3. Token Price \u2014 30d: +8.4%, 90d: +22.1%\n   Daily \u03c3: 3.8%\n4. Lock-up \u2014 14 days, Risk Score: 4/10\n5. Smart Contract \u2014 Audit score, exploit history, etc.\nRisk Delta\n  Risk(\u03b4) = 14.2% \u2212 11.8% = 2.4%\n  This gap is the risk premium in the advertised rate.",
   },
   {
     trigger: "initia",
@@ -538,38 +544,55 @@ function Hero({ onDemo, onWallet }) {
 function Features() {
   const items = [
     { icon: Icons.verify, title: "APY Verification", desc: "We independently compute yields from on-chain data \u2014 TVL, revenue, fees \u2014 and compare against what protocols advertise.", tag: "Core Engine" },
-    { icon: Icons.chart, title: "6-Factor Risk Model", desc: "Every protocol is scored across TVL stability, APY consistency, revenue coverage, whale concentration, token trends, and lock-up risk.", tag: "Risk Analysis" },
+    { icon: Icons.chart, title: "Multi-Factor Risk Model", desc: "Every protocol is scored across TVL stability, APY consistency, revenue coverage, whale concentration, token trends, lock-up risk, smart contract audits, etc.", tag: "Risk Analysis" },
     { icon: Icons.bot, title: "AI Portfolio Agent", desc: "Describe your risk tolerance and goals in natural language. Our agent builds a diversified yield farming portfolio matched to your profile.", tag: "Intelligence" },
     { icon: Icons.monitor, title: "Continuous Monitoring", desc: "Track APY shifts, TVL outflows, and whale movements in real-time. Get alerts when risk thresholds change.", tag: "Monitoring" },
+    { icon: "iusd", title: "Pay As You Consume", desc: "Each chat interaction consumes LLM tokens, paid in INIT. One message, one transaction \u2014 no subscriptions, no hidden costs. You only pay for what you use.", tag: "On-Chain Billing" },
   ];
+  const topRow = items.slice(0, 3);
+  const bottomRow = items.slice(3);
+  const iusdSrc = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMC45Mzc1IiB5PSIwLjkzNzUiIHdpZHRoPSI1OC4xMjUiIGhlaWdodD0iNTguMTI1IiByeD0iMjkuMDYyNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjg3NSIvPgo8Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIzMCIgZmlsbD0iIzIyMjMyMyIvPgo8cGF0aCBkPSJNMjAuMzEyMiA5Ljg3NzQ3QzEyLjgzMjkgMTMuNDg1MyA3LjY3MTY5IDIxLjEzOTkgNy42NzE2OSAyOS45OTk5QzcuNjcyMDUgMzguODU5MyAxMi44MzM1IDQ2LjUxMjEgMjAuMzEyMiA1MC4xMjAxVjUyLjI3NjhDMTIuMDc4OSA0OC42OTE4IDYuMjE2MDUgNDAuNjgyOSA1LjczODA5IDMxLjI0ODRMNS43MDY1NCAyOS45OTk5QzUuNzA2NTQgMjAuMDI3NSAxMS43MTc1IDExLjQ2MTIgMjAuMzEyMiA3LjcxODUyVjkuODc3NDdaIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zOS42ODg3IDcuNzIwNzdDNDguMjgyNSAxMS40NjM2IDU0LjI5MiAyMC4wMjc5IDU0LjI5MiAyOS45OTk5TDU0LjI2MDUgMzEuMjQ4NEM1My43ODI1IDQwLjY4MjQgNDcuOTIwOSA0OC42ODkzIDM5LjY4ODcgNTIuMjc0NlY1MC4xMjI0QzQ3LjE2ODEgNDYuNTE0NiA1Mi4zMjg4IDM4Ljg1OTggNTIuMzI5MSAyOS45OTk5QzUyLjMyOTEgMjEuMTM5NSA0Ny4xNjg3IDEzLjQ4MjggMzkuNjg4NyA5Ljg3NTIyVjcuNzIwNzdaIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0zNS41NTA2IDIxLjEwMjRDMzMuOTM1IDIwLjM5NTIgMzEuOTgxNCAyMC4yMDcgMzAuMTE2IDIwLjIwNjlIMjkuNzI3M0MyNy40ODcyIDIwLjIwNyAyNS40NDc1IDIwLjUwNDkgMjMuOTM4MyAyMS4zOTM1QzIyLjMzMDMgMjIuMzQwNSAyMS40Mzk0IDIzLjg5MDcgMjEuNDM5MyAyNi4wMjA0VjI2LjE0MjVDMjEuNDM5MyAyNy42MSAyMS44MjA4IDI4Ljk2NTkgMjIuOTk3OCAyOS45MzY0QzI0LjExMTkgMzAuODU0OSAyNS43NjEyIDMxLjI3MTYgMjcuOTA3MSAzMS4zNzJMMjcuOTE0OSAzMS4zNzI5TDMyLjIyNTQgMzEuNTQxOUMzNC4wMzY2IDMxLjYyNyAzNC45Mzc3IDMxLjg1MzQgMzUuMzkwNCAzMi4xNTEyQzM1LjY5MjQgMzIuMzUgMzUuOTAwMiAzMi42NDczIDM1LjkwMDIgMzMuNTQyOFYzMy43NjA2QzM1LjkwMDIgMzQuMzAxNCAzNS43ODQyIDM0LjY4MDEgMzUuNjEyMSAzNC45NTg5QzM1LjQ0IDM1LjIzNzUgMzUuMTY2OSAzNS40ODk0IDM0LjczNjEgMzUuNzA2QzMzLjgyOSAzNi4xNjE5IDMyLjM2NjYgMzYuMzkwNSAzMC4yNjE1IDM2LjM5MDVDMjguODE4MSAzNi4zOTA1IDI3LjQ1ODEgMzYuMjY5MyAyNi4zODY1IDM1LjkwNDJDMjUuMzM1OSAzNS41NDYyIDI0LjY4MDQgMzUuMDAwMSAyNC4zODk0IDM0LjIwMDFMMjQuMTM1NiAzMy41MDM4SDIwLjQ3NDRMMjAuNzg5OCAzNC44MDk0QzIxLjMwMTUgMzYuOTMxMyAyMi43NTk3IDM4LjIwMTcgMjQuNDk5OCAzOC45MTFDMjYuMTk4NyAzOS42MDM1IDI4LjIyMyAzOS43OTI5IDMwLjA5MTYgMzkuNzkyOUgzMC4zNTgyQzMyLjY5NTUgMzkuNzkyOSAzNC45NDM4IDM5LjU0ODEgMzYuNjM0NiAzOC42NTMyQzM3LjUwMiAzOC4xOTQgMzguMjQxIDM3LjU1NDIgMzguNzU1NyAzNi42ODI1QzM5LjI2OTEgMzUuODEyOCAzOS41MjAzIDM0Ljc3ODYgMzkuNTIwMyAzMy41OTA3VjMzLjM3MjlDMzkuNTIwMyAzMS44OTU2IDM5LjE0MDIgMzAuNTM2MiAzNy45NTk4IDI5LjU2NzNDMzYuODQ0NyAyOC42NTIxIDM1LjE5NDggMjguMjQyNyAzMy4wNTI1IDI4LjE0MjVIMzMuMDQ0N0wyOC43MzQyIDI3Ljk3MjZDMjYuOTIyNiAyNy44ODc0IDI2LjAyMTggMjcuNjYxMSAyNS41NjkxIDI3LjM2MzJDMjUuMjY3MSAyNy4xNjQ0IDI1LjA1OTQgMjYuODY3OSAyNS4wNTk0IDI1Ljk3MjZWMjUuODk5M0MyNS4wNTk0IDI1LjQzODcgMjUuMTQ5OCAyNS4xMTc0IDI1LjI4MiAyNC44ODI3QzI1LjQxMTggMjQuNjUyNSAyNS42MTg3IDI0LjQzOTkgMjUuOTYwNyAyNC4yNTE5QzI2LjY5MjMgMjMuODQ5NyAyNy45NDU1IDIzLjYwOTMgMjkuOTIxNyAyMy42MDkzQzMxLjUwMDYgMjMuNjA5MyAzMi43ODUzIDIzLjc1MDEgMzMuNzI3MyAyNC4xMTIyQzM0LjYxNzkgMjQuNDU0NiAzNS4xNDc3IDI0Ljk2NzEgMzUuMzg2NSAyNS43NjU1TDM1LjYxMjEgMjYuNTIwNEgzOS4yNTc2TDM4Ljk4ODEgMjUuMjQ0QzM4LjU0MjcgMjMuMTM1NiAzNy4yMjQ5IDIxLjgzNTQgMzUuNTUwNiAyMS4xMDI0WiIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBkPSJNMzQuODgwNSA4LjY2NDEyQzMzLjEwNTcgOS4wMTI4MiAzMS44MDcxIDEwLjU2NjkgMzEuNzc3MiAxMi40MDk2VjE0LjE5SDI4LjIyNzhWMTIuNDAwNkMyOC4xOTc5IDEwLjU2NzYgMjYuODk3NCA5LjAxMzA0IDI1LjEyMjMgOC42NjQxMlY1LjA1ODM1QzI2Ljk0OTQgNS4yNDQzNCAyOC42NDIyIDYuMTA3NTcgMjkuODYzOSA3LjQ3ODcyTDMwLjAwMTQgNy42Mzg3M0wzMC4xNDExIDcuNDc4NzJDMzEuMzgwNiA2LjEwMzkxIDMzLjA2NiA1LjI0NzY3IDM0Ljg4MDUgNS4wNTgzNVY4LjY2NDEyWiIgZmlsbD0iI0Y1RjVGNSIvPgo8cGF0aCBkPSJNMzQuODgwNSA1MS4zMzZDMzMuMTA1OCA1MC45ODczIDMxLjgwNzEgNDkuNDMzMiAzMS43NzczIDQ3LjU5MDVWNDUuODEwMkgyOC4yMjc4VjQ3LjU5OTVDMjguMTk4IDQ5LjQzMjUgMjYuODk3NCA1MC45ODcxIDI1LjEyMjQgNTEuMzM2VjU0Ljk0MThDMjYuOTQ5NSA1NC43NTU4IDI4LjY0MjIgNTMuODkyNiAyOS44NjQgNTIuNTIxNEwzMC4wMDE0IDUyLjM2MTRMMzAuMTQxMiA1Mi41MjE0QzMxLjM4MDYgNTMuODk2MiAzMy4wNjYgNTQuNzUyNSAzNC44ODA1IDU0Ljk0MThWNTEuMzM2WiIgZmlsbD0iI0Y1RjVGNSIvPgo8L3N2Zz4K";
+  const FeatureCard = ({ item }) => (
+    <div style={{
+      padding: 36, borderRadius: T.radiusLg,
+      border: `1px solid ${T.cardBorder}`, background: T.card,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        {item.icon === "iusd" ? (
+          <div style={{
+            width: 44, height: 44, borderRadius: 12, overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <img src={iusdSrc} alt="iUSD" width={44} height={44} style={{ display: "block" }} />
+          </div>
+        ) : (
+          <div style={{
+            width: 44, height: 44, borderRadius: 12,
+            background: T.bgWarm, color: T.text,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>{item.icon}</div>
+        )}
+        <span style={{
+          fontSize: 11, fontWeight: 500, color: T.textMuted,
+          padding: "4px 10px", borderRadius: 100,
+          border: "1px solid rgba(0,0,0,0.08)",
+        }}>{item.tag}</span>
+      </div>
+      <h3 style={{ fontSize: 18, fontWeight: 600, color: T.text, margin: "0 0 10px" }}>{item.title}</h3>
+      <p style={{ fontSize: 15, color: T.textSoft, lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
+    </div>
+  );
   return (
     <section id="features" style={{ padding: "100px 48px", maxWidth: 1120, margin: "0 auto" }}>
       <div style={{ marginBottom: 64 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Capabilities</p>
         <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: 0, maxWidth: 400 }}>What makes initFarm different</h2>
       </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+        {topRow.map((item) => <FeatureCard key={item.title} item={item} />)}
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        {items.map((item) => (
-          <div key={item.title} style={{
-            padding: 36, borderRadius: T.radiusLg,
-            border: `1px solid ${T.cardBorder}`, background: T.card,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: T.bgWarm, color: T.text,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>{item.icon}</div>
-              <span style={{
-                fontSize: 11, fontWeight: 500, color: T.textMuted,
-                padding: "4px 10px", borderRadius: 100,
-                border: "1px solid rgba(0,0,0,0.08)",
-              }}>{item.tag}</span>
-            </div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: T.text, margin: "0 0 10px" }}>{item.title}</h3>
-            <p style={{ fontSize: 15, color: T.textSoft, lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
-          </div>
-        ))}
+        {bottomRow.map((item) => <FeatureCard key={item.title} item={item} />)}
       </div>
     </section>
   );
@@ -1025,7 +1048,7 @@ function Process() {
     {
       n: "03", t: "Quantify",
       d: "Calculate Risk(\u03b4) = Nominal APY \u2212 Own APY to measure the risk premium. Score every protocol across all six risk parameters with weighted analysis.",
-      detail: "6-factor weighted risk scoring",
+      detail: "Multi-factor weighted risk scoring",
     },
     {
       n: "04", t: "Construct",
@@ -1480,7 +1503,21 @@ function Footer() {
   );
 }
 /* ─── Chat Components ─── */
-function ChatMessage({ role, content }) {
+/* ─── Txn helpers ─── */
+function genTxnHash() {
+  const hex = "0123456789abcdef";
+  let h = "0x";
+  for (let i = 0; i < 12; i++) h += hex[Math.floor(Math.random() * 16)];
+  return h;
+}
+function estimateTokens(text) {
+  return Math.max(80, Math.round(text.length / 3.5));
+}
+function tokenToINIT(tokens) {
+  /* ~0.000012 INIT per token */
+  return (tokens * 0.000012).toFixed(6);
+}
+function ChatMessage({ role, content, txn }) {
   const isUser = role === "user";
   return (
     <div style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start", marginBottom: 20 }}>
@@ -1492,12 +1529,30 @@ function ChatMessage({ role, content }) {
           fontSize: 12, color: isUser ? T.text : "#fff", fontWeight: 600,
           border: isUser ? `1px solid ${T.cardBorder}` : "none",
         }}>{isUser ? "W" : "iF"}</div>
-        <div style={{
-          background: isUser ? T.bgWarm : T.card,
-          borderRadius: 14, padding: "14px 18px",
-          fontSize: 14, color: T.text, lineHeight: 1.7,
-          whiteSpace: "pre-wrap", border: `1px solid ${T.cardBorder}`,
-        }}>{content}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{
+            background: isUser ? T.bgWarm : T.card,
+            borderRadius: 14, padding: "14px 18px",
+            fontSize: 14, color: T.text, lineHeight: 1.7,
+            whiteSpace: "pre-wrap", border: `1px solid ${T.cardBorder}`,
+          }}>{content}</div>
+          {txn && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "6px 12px", borderRadius: 8,
+              background: "rgba(34,197,94,0.04)", border: "1px solid rgba(34,197,94,0.1)",
+              fontSize: 10, color: T.textMuted, fontFamily: "'SF Mono', 'Fira Code', monospace",
+            }}>
+              <div style={{ width: 4, height: 4, borderRadius: "50%", background: T.green, flexShrink: 0 }} />
+              <span style={{ color: T.green, fontWeight: 600 }}>TXN</span>
+              <span>{txn.hash}</span>
+              <span style={{ color: "rgba(0,0,0,0.2)" }}>{"\u00B7"}</span>
+              <span>{txn.tokens} tokens</span>
+              <span style={{ color: "rgba(0,0,0,0.2)" }}>{"\u00B7"}</span>
+              <span style={{ fontWeight: 600, color: T.text }}>{txn.cost} INIT</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1531,17 +1586,29 @@ function ChatPanel({ onClose }) {
   const [typing, setTyping] = useState(false);
   const endRef = useRef(null);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, typing]);
+
+  const addAIResponse = (userMsg) => {
+    const aiText = getAIResponse(userMsg);
+    const tokens = estimateTokens(aiText);
+    const cost = tokenToINIT(tokens);
+    const hash = genTxnHash();
+    setMessages((p) => [...p, { role: "assistant", content: aiText, txn: { tokens, cost, hash } }]);
+  };
+
   const send = () => {
     if (!input.trim() || typing) return;
     const msg = input.trim();
     setInput("");
     setMessages((p) => [...p, { role: "user", content: msg }]);
     setTyping(true);
-    setTimeout(() => {
-      setTyping(false);
-      setMessages((p) => [...p, { role: "assistant", content: getAIResponse(msg) }]);
-    }, 1200 + Math.random() * 800);
+    setTimeout(() => { setTyping(false); addAIResponse(msg); }, 1200 + Math.random() * 800);
   };
+
+  /* Running totals */
+  const totalTokens = messages.reduce((s, m) => s + (m.txn?.tokens || 0), 0);
+  const totalCost = messages.reduce((s, m) => s + (m.txn ? parseFloat(m.txn.cost) : 0), 0);
+  const txnCount = messages.filter((m) => m.txn).length;
+
   const chips = ["Build me a portfolio", "Risk analysis", "About Initia"];
   return (
     <div style={{
@@ -1573,15 +1640,29 @@ function ChatPanel({ onClose }) {
               </div>
             </div>
           </div>
-          <button onClick={onClose} style={{
-            width: 34, height: 34, borderRadius: 10,
-            border: `1px solid ${T.cardBorder}`, background: "transparent",
-            color: T.textMuted, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>{Icons.close}</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {txnCount > 0 && (
+              <div style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "6px 12px", borderRadius: 8,
+                background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.1)",
+                fontSize: 11, fontFamily: "'SF Mono', 'Fira Code', monospace",
+              }}>
+                <span style={{ color: T.textMuted }}>{txnCount} txn{txnCount > 1 ? "s" : ""}</span>
+                <span style={{ color: "rgba(0,0,0,0.15)" }}>{"\u00B7"}</span>
+                <span style={{ fontWeight: 600, color: T.green }}>{totalCost.toFixed(6)} INIT</span>
+              </div>
+            )}
+            <button onClick={onClose} style={{
+              width: 34, height: 34, borderRadius: 10,
+              border: `1px solid ${T.cardBorder}`, background: "transparent",
+              color: T.textMuted, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>{Icons.close}</button>
+          </div>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: 24, background: T.bg }}>
-          {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} />)}
+          {messages.map((m, i) => <ChatMessage key={i} role={m.role} content={m.content} txn={m.txn} />)}
           {typing && <TypingDots />}
           <div ref={endRef} />
         </div>
@@ -1591,10 +1672,7 @@ function ChatPanel({ onClose }) {
               <button key={c} onClick={() => {
                 setMessages((p) => [...p, { role: "user", content: c }]);
                 setTyping(true);
-                setTimeout(() => {
-                  setTyping(false);
-                  setMessages((p) => [...p, { role: "assistant", content: getAIResponse(c) }]);
-                }, 1200 + Math.random() * 800);
+                setTimeout(() => { setTyping(false); addAIResponse(c); }, 1200 + Math.random() * 800);
               }} style={{
                 padding: "8px 14px", borderRadius: 100,
                 border: `1px solid ${T.cardBorder}`, background: T.card,
