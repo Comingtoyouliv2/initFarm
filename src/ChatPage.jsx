@@ -114,10 +114,10 @@ const IPS_STEPS = [
         label: "Return Objective",
         description: "What annualized return range are you targeting?",
         options: [
-          { value: 1, label: "Conservative", desc: "4% ~ 8% APY" },
-          { value: 2, label: "Balanced", desc: "8% ~ 15% APY" },
-          { value: 3, label: "Growth", desc: "15% ~ 25% APY" },
-          { value: 4, label: "Aggressive", desc: "25%+ APY" },
+          { value: 1, label: "Conservative", desc: "2% ~ 5% APY" },
+          { value: 2, label: "Balanced", desc: "5% ~ 8% APY" },
+          { value: 3, label: "Growth", desc: "8% ~ 11% APY" },
+          { value: 4, label: "Aggressive", desc: "11% ~ 13% APY" },
         ],
       },
       {
@@ -504,7 +504,7 @@ function IPSFormMessage({ stepData, ipsValues, onFieldChange, onStrategyChange, 
           )}
         </div>
       </div>
-      <TokenUsageTag charLen={stepData.fields.length * 80 + (stepData.strategyField ? 200 : 0)} />
+      <TokenUsageTag usage={estimateTokenUsage(stepData.fields.length * 80 + (stepData.strategyField ? 200 : 0))} />
     </div>
   );
 }
@@ -803,7 +803,7 @@ function PortfolioChartMessage({ data, onNewIPS, onApply, walletConnected }) {
           )}
         </div>
       </div>
-      <TokenUsageTag charLen={items.length * 120 + 300} />
+      <TokenUsageTag usage={estimateTokenUsage(items.length * 120 + 300)} />
     </div>
   );
 }
@@ -1027,7 +1027,7 @@ function DepositFormMessage({ portfolioData, onConfirm, onCancel, walletConnecte
           </div>
         </div>
       </div>
-      <TokenUsageTag charLen={350} />
+      <TokenUsageTag usage={estimateTokenUsage(350)} />
     </div>
   );
 }
@@ -1434,24 +1434,26 @@ function useTypingEffect(text, speed = 12) {
   return { displayed, done };
 }
 
-/* ─── Mock token usage estimator ─── */
+/* ─── Token usage estimator (deterministic) ─── */
+const COST_PER_TOKEN = 0.0002; // INIT per token
 function estimateTokenUsage(charLen) {
   const len = charLen || 100;
-  const outputTokens = Math.max(12, Math.round(len / 4) + Math.round(Math.random() * 15));
-  const inputTokens = Math.round(outputTokens * (0.6 + Math.random() * 0.4));
+  const outputTokens = Math.max(12, Math.round(len / 3.8));
+  const inputTokens = Math.round(outputTokens * 0.75);
   const total = inputTokens + outputTokens;
-  const cost = total * 0.0002;
-  return { inputTokens, outputTokens, total, cost };
+  const cost = total * COST_PER_TOKEN;
+  const costMicro = Math.max(1, Math.round(cost * 1_000_000)); // uinit, minimum 1
+  return { inputTokens, outputTokens, total, cost, costMicro };
 }
 
 /* ─── Token Usage Tag (reusable) ─── */
-function TokenUsageTag({ charLen }) {
-  const usage = React.useMemo(() => estimateTokenUsage(charLen), [charLen]);
+function TokenUsageTag({ usage, txHash, txStatus }) {
+  if (!usage) return null;
   return (
     <div style={{
       marginTop: 6, marginLeft: 44,
       display: "flex", alignItems: "center", gap: 6,
-      fontSize: 11, color: T.textMuted,
+      fontSize: 11, color: T.textMuted, flexWrap: "wrap",
     }}>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
@@ -1461,12 +1463,44 @@ function TokenUsageTag({ charLen }) {
       <span>{usage.inputTokens} in / {usage.outputTokens} out</span>
       <span style={{ color: T.cardBorder }}>·</span>
       <span style={{ color: T.orange, fontWeight: 600 }}>{usage.cost.toFixed(4)} INIT</span>
+      {txStatus === "pending" && (
+        <>
+          <span style={{ color: T.cardBorder }}>·</span>
+          <span style={{ color: T.textMuted, fontStyle: "italic" }}>paying...</span>
+        </>
+      )}
+      {txStatus === "failed" && (
+        <>
+          <span style={{ color: T.cardBorder }}>·</span>
+          <span style={{ color: "#EF4444", fontWeight: 500 }}>unpaid</span>
+        </>
+      )}
+      {txHash && (
+        <>
+          <span style={{ color: T.cardBorder }}>·</span>
+          <a
+            href={`https://scan.testnet.initia.xyz/initiation-2/txs/${txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              color: T.green, fontWeight: 600, textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 3,
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            tx
+          </a>
+        </>
+      )}
     </div>
   );
 }
 
 /* ─── Chat Message Component ─── */
-function Message({ role, content, typing, onSuggestionClick, suggestions, showSuggestions }) {
+function Message({ role, content, typing, onSuggestionClick, suggestions, showSuggestions, tokenUsage, txHash, txStatus }) {
   const isUser = role === "user";
   const { displayed, done } = useTypingEffect(typing ? content : null, 8);
   const show = typing ? displayed : content;
@@ -1516,8 +1550,8 @@ function Message({ role, content, typing, onSuggestionClick, suggestions, showSu
       </div>
 
       {/* Token usage indicator for AI messages */}
-      {!isUser && content && (typing ? done : true) && (
-        <TokenUsageTag charLen={typeof content === "string" ? content.length : 100} />
+      {!isUser && tokenUsage && (typing ? done : true) && (
+        <TokenUsageTag usage={tokenUsage} txHash={txHash} txStatus={txStatus} />
       )}
 
       {/* Suggestion chips after AI message */}
@@ -1572,6 +1606,11 @@ function ChatPageInner() {
   const navigate = useNavigate();
   const kit = useInterwovenKit();
   const walletConnected = !!kit.address;
+  // Keep refs so async callbacks always see latest values
+  const kitRef = useRef(kit);
+  kitRef.current = kit;
+  const walletRef = useRef(walletConnected);
+  walletRef.current = walletConnected;
   /* ─── Multi-conversation state ─── */
   const [conversations, setConversations] = useState(() => loadConversations());
   const [activeConvoId, setActiveConvoId] = useState(() => loadActiveId());
@@ -1638,11 +1677,52 @@ function ChatPageInner() {
     });
   };
 
+  const chargeTokenFee = async (convoId, msgId, usage) => {
+    const k = kitRef.current;
+    const connected = walletRef.current;
+    console.log("[initFarm] chargeTokenFee:", { connected, address: k?.address, costMicro: usage.costMicro });
+    if (!connected || !k?.address || usage.costMicro <= 0) return;
+
+    try {
+      console.log("[initFarm] Sending MsgSend:", usage.costMicro, "uinit to", VAULT_BECH32);
+      const result = await k.requestTxBlock({
+        messages: [{
+          typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+          value: {
+            fromAddress: k.address,
+            toAddress: VAULT_BECH32,
+            amount: [{ amount: String(usage.costMicro), denom: "uinit" }],
+          },
+        }],
+      });
+      console.log("[initFarm] Payment success:", result.transactionHash);
+      updateConvo(convoId, (c) => ({
+        messages: c.messages.map((m) =>
+          m.id === msgId ? { ...m, txHash: result.transactionHash, txStatus: "paid" } : m
+        ),
+      }));
+    } catch (err) {
+      console.error("[initFarm] Payment failed:", err);
+      updateConvo(convoId, (c) => ({
+        messages: c.messages.map((m) =>
+          m.id === msgId ? { ...m, txStatus: "failed", txError: err?.message || "Unknown error" } : m
+        ),
+      }));
+    }
+  };
+
   const addAIResponse = (convoId, aiMsg) => {
     const id = nextId();
+    const charLen = typeof aiMsg.content === "string" ? aiMsg.content.length : 100;
+    const usage = estimateTokenUsage(charLen);
+    const isConnected = walletRef.current;
+    const fullMsg = { ...aiMsg, id, tokenUsage: usage, txStatus: isConnected ? "pending" : null, txHash: null };
     setTypingMsgId(id);
-    pushToConvo(convoId, { ...aiMsg, id });
+    pushToConvo(convoId, fullMsg);
     setIsTyping(false);
+
+    // Charge token fee after a short delay to ensure state is settled
+    setTimeout(() => chargeTokenFee(convoId, id, usage), 500);
   };
 
   /* ─── Start new conversation with IPS ─── */
@@ -1783,19 +1863,55 @@ function ChatPageInner() {
           id: nextId(), role: "portfolio_chart",
           portfolioData: portfolioData,
         };
+        const followUpContent = "Your portfolio is ready. You can explore more topics below — run a risk assessment, verify APY for any protocol, or dive into Initia staking opportunities.";
+        const followUpUsage = estimateTokenUsage(followUpContent.length);
+        const followUpId = nextId();
         const followUp = {
-          id: nextId(), role: "assistant",
-          content: "Your portfolio is ready. You can explore more topics below — run a risk assessment, verify APY for any protocol, or dive into Initia staking opportunities.",
+          id: followUpId, role: "assistant",
+          content: followUpContent,
           suggestions: SCENARIOS.welcome.suggestions,
+          tokenUsage: followUpUsage,
+          txStatus: walletConnected ? "pending" : null,
+          txHash: null,
         };
         updateConvo(cId, (c) => ({
           messages: [...c.messages, chartMsg, followUp],
           ipsComplete: true,
           title: "Portfolio - IPS Complete",
         }));
-        setTypingMsgId(followUp.id);
+        setTypingMsgId(followUpId);
         setIsTyping(false);
         setIpsFormValues({});
+
+        // Charge token fee
+        if (walletConnected && followUpUsage.costMicro > 0) {
+          (async () => {
+            try {
+              const { transactionHash } = await kit.requestTxBlock({
+                messages: [{
+                  typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+                  value: {
+                    fromAddress: kit.address,
+                    toAddress: VAULT_BECH32,
+                    amount: [{ amount: String(followUpUsage.costMicro), denom: "uinit" }],
+                  },
+                }],
+              });
+              updateConvo(cId, (c) => ({
+                messages: c.messages.map((m) =>
+                  m.id === followUpId ? { ...m, txHash: transactionHash, txStatus: "paid" } : m
+                ),
+              }));
+            } catch (err) {
+              console.warn("Token fee payment failed:", err);
+              updateConvo(cId, (c) => ({
+                messages: c.messages.map((m) =>
+                  m.id === followUpId ? { ...m, txStatus: "failed" } : m
+                ),
+              }));
+            }
+          })();
+        }
       }, 800 + Math.random() * 400);
     }
   };
@@ -2273,6 +2389,9 @@ function ChatPageInner() {
                   suggestions={m.suggestions}
                   showSuggestions={i === messages.length - 1 && ipsComplete}
                   onSuggestionClick={handleSuggestion}
+                  tokenUsage={m.tokenUsage}
+                  txHash={m.txHash}
+                  txStatus={m.txStatus}
                 />
               );
             })}

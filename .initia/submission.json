@@ -1,8 +1,8 @@
 {
   "project_name": "initFarm",
   "track": "DeFi",
-  "tagline": "AI-powered DeFi yield farming portfolio engine with on-chain APY verification",
-  "description": "initFarm analyzes DeFi protocols using on-chain data to verify APY claims, quantify risk with a 6-factor model, and construct optimized portfolios. It uses InterwovenKit for wallet connection and Initia-native features including Auto-Sign sessions and .init username support.",
+  "tagline": "Bringing Wall Street-grade portfolio intelligence to every DeFi user — AI that reads the chain, manages your risk, and executes in one click.",
+  "description": "initFarm is an AI-powered DeFi robo-advisor built on Initia. Users describe their investment goals through a conversational IPS (Investment Policy Statement) flow, and the AI engine analyzes on-chain protocol data to verify real APY, scores risk across multiple factors (TVL stability, audit history, protocol age, impermanent loss exposure, smart contract complexity, and liquidity depth), then constructs an optimized portfolio tailored to the user's risk profile. Users can execute the recommended allocation directly from their wallet in a single transaction via the deployed AUM vault contract on Initia testnet. Every AI interaction is charged as an on-chain INIT micro-payment with verifiable transaction receipts.",
   "team": [
     {
       "name": "Wonjae",
