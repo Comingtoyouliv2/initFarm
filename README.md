@@ -152,7 +152,7 @@ No subscriptions. We earn only when you earn. All fees are settled in iUSD (Init
 
 ## Team
 
-- **Wonjae** -- Builder
+- **Noah** -- Builder
 
 ## License
 
