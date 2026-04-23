@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 /* ─── Design Tokens ─── */
 const T = {
@@ -393,8 +392,8 @@ function Navbar({ onDemo, onWallet }) {
     return () => window.removeEventListener("scroll", h);
   }, []);
   const links = [
-    { label: "Pools", href: "#pools" },
     { label: "Features", href: "#features" },
+    { label: "Pools", href: "#pools" },
     { label: "Process", href: "#process" },
     { label: "Pricing", href: "#pricing" },
   ];
@@ -596,6 +595,7 @@ function Features() {
   const riskFactors = [
     { label: "TVL Stability", desc: "Size, trend & concentration" },
     { label: "Revenue Coverage", desc: "Fee revenue vs. yield payout" },
+    { label: "APY Consistency", desc: "Volatility & 30/90d deviation" },
     { label: "Whale Concentration", desc: "Top-wallet share & exit risk" },
     { label: "Token Price Trend", desc: "Momentum & daily volatility" },
     { label: "Lock-up Risk", desc: "Unbonding period & liquidity" },
@@ -672,7 +672,7 @@ function Features() {
           We independently compute yields from on-chain data and compare against what protocols advertise. Each protocol is scored through our multi-factor risk model to produce a single risk grade (A-D).
         </p>
         <p style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", margin: "0 0 16px" }}>Multi-Factor Risk Model</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
           {riskFactors.map((f) => (
             f.label === "more" ? (
               <div key={f.label} style={{
@@ -680,7 +680,7 @@ function Features() {
                 background: "rgba(0,0,0,0.02)", border: "1px dashed rgba(0,0,0,0.1)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <p style={{ fontSize: 13, fontWeight: 500, color: T.textMuted, margin: 0 }}>+@ more factors</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: T.textMuted, margin: 0 }}>+12 more factors</p>
               </div>
             ) : (
               <div key={f.label} style={{
@@ -763,15 +763,15 @@ function YieldDistChart({ nominal, real, stddev }) {
 }
 /* ─── Pool Data ─── */
 const POOL_DATA = [
-  { pool: "Lido ETH Staking", ticker: "ETH", nominal: 2.51, real: 2.31, stddev: 0.35, tvl: "$19.6B", risk: "A", riskLabel: "Lowest", lockup: "None", logo: "/ETH.svg" },
-  { pool: "Binance ETH Staking", ticker: "WBETH", nominal: 2.61, real: 2.38, stddev: 0.32, tvl: "$7.3B", risk: "A", riskLabel: "Lowest", lockup: "None", logo: "/ETH.svg" },
-  { pool: "EtherFi ETH Staking", ticker: "weETH", nominal: 2.43, real: 2.10, stddev: 0.42, tvl: "$6.3B", risk: "B", riskLabel: "Low", lockup: "None", logo: "/ETH.svg" },
-  { pool: "Sky USD Fee Sharing", ticker: "USDS", nominal: 4.00, real: 3.65, stddev: 0.55, tvl: "$5.5B", risk: "A", riskLabel: "Lowest", lockup: "None", logo: "/usd-coin-usdc-logo.svg" },
-  { pool: "Aave ETH Lending", ticker: "weETH", nominal: 1.82, real: 1.82, stddev: 0.90, tvl: "$5.0B", risk: "B", riskLabel: "Low", lockup: "None", logo: "/ETH.svg" },
-  { pool: "Ethena USD Yield", ticker: "USDe", nominal: 3.54, real: 2.90, stddev: 0.72, tvl: "$3.5B", risk: "B", riskLabel: "Low", lockup: "7 days", logo: "/ethena-usde-usde-logo.svg" },
-  { pool: "Polkadot Staking", ticker: "DOT", nominal: 12.00, real: 5.50, stddev: 1.80, tvl: "$4.8B", risk: "C", riskLabel: "Medium", lockup: "28 days", logo: "/polkadot-new-dot-logo.svg" },
-  { pool: "Solana Staking", ticker: "SOL", nominal: 7.20, real: 5.80, stddev: 1.20, tvl: "$12.4B", risk: "B", riskLabel: "Low", lockup: "~2 days", logo: "/solana-sol-logo.svg" },
-  { pool: "Celestia Staking", ticker: "TIA", nominal: 14.20, real: 7.80, stddev: 2.80, tvl: "$3.2B", risk: "C", riskLabel: "Medium", lockup: "21 days", logo: "/celestia-tia-logo.svg" },
+  { pool: "Lido ETH Staking", ticker: "ETH", nominal: 2.51, real: 2.31, stddev: 0.35, tvl: "$19.6B", risk: "A", riskLabel: "Lowest", lockup: "None" },
+  { pool: "Binance ETH Staking", ticker: "WBETH", nominal: 2.61, real: 2.38, stddev: 0.32, tvl: "$7.3B", risk: "A", riskLabel: "Lowest", lockup: "None" },
+  { pool: "EtherFi ETH Staking", ticker: "weETH", nominal: 2.43, real: 2.10, stddev: 0.42, tvl: "$6.3B", risk: "B", riskLabel: "Low", lockup: "None" },
+  { pool: "Sky USD Fee Sharing", ticker: "USDS", nominal: 4.00, real: 3.65, stddev: 0.55, tvl: "$5.5B", risk: "A", riskLabel: "Lowest", lockup: "None" },
+  { pool: "Aave ETH Lending", ticker: "weETH", nominal: 1.82, real: 1.82, stddev: 0.90, tvl: "$5.0B", risk: "B", riskLabel: "Low", lockup: "None" },
+  { pool: "Ethena USD Yield", ticker: "USDe", nominal: 3.54, real: 2.90, stddev: 0.72, tvl: "$3.5B", risk: "B", riskLabel: "Low", lockup: "7 days" },
+  { pool: "Polkadot Staking", ticker: "DOT", nominal: 12.00, real: 5.50, stddev: 1.80, tvl: "$4.8B", risk: "C", riskLabel: "Medium", lockup: "28 days" },
+  { pool: "Solana Staking", ticker: "SOL", nominal: 7.20, real: 5.80, stddev: 1.20, tvl: "$12.4B", risk: "B", riskLabel: "Low", lockup: "~2 days" },
+  { pool: "Celestia Staking", ticker: "TIA", nominal: 14.20, real: 7.80, stddev: 2.80, tvl: "$3.2B", risk: "C", riskLabel: "Medium", lockup: "21 days" },
 ];
 const RISK_COLORS = {
   A: { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
@@ -899,16 +899,12 @@ function PoolTable() {
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <div style={{
                       width: 40, height: 40, borderRadius: "50%",
-                      background: p.logo ? "#fff" : "linear-gradient(135deg, #D4C8B8, #BFB5A5)",
+                      background: "linear-gradient(135deg, #D4C8B8, #BFB5A5)",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      border: "1px solid rgba(0,0,0,0.06)", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                      flexShrink: 0, overflow: "hidden",
+                      border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                      flexShrink: 0,
                     }}>
-                      {p.logo ? (
-                        <img src={p.logo} alt={p.ticker} width={28} height={28} style={{ objectFit: "contain" }}/>
-                      ) : (
-                        <span style={{ fontSize: 14, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.15)" }}>{p.ticker.charAt(0)}</span>
-                      )}
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.15)" }}>{p.ticker.charAt(0)}</span>
                     </div>
                     <div>
                       <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{p.pool}</span>
@@ -1338,306 +1334,6 @@ function Process() {
     </section>
   );
 }
-/* ─── How To Use ─── */
-function HowToUse() {
-  const sectionRef = useRef(null);
-  const [visibleSteps, setVisibleSteps] = useState(new Set());
-  const [activeStep, setActiveStep] = useState(0);
-
-  useEffect(() => {
-    const observers = [];
-    const stepEls = sectionRef.current?.querySelectorAll("[data-step]");
-    if (!stepEls) return;
-    stepEls.forEach((el) => {
-      const obs = new IntersectionObserver(([entry]) => {
-        const idx = parseInt(el.dataset.step);
-        setVisibleSteps((prev) => {
-          const next = new Set(prev);
-          if (entry.isIntersecting) next.add(idx); else next.delete(idx);
-          return next;
-        });
-        if (entry.isIntersecting) setActiveStep(idx);
-      }, { threshold: 0.3 });
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
-
-  const howSteps = [
-    {
-      num: "01",
-      title: "Define Your Strategy",
-      description: "Set your Investment Policy Statement through our guided 4-step form. Choose your return targets, risk tolerance, time horizon, and preferred strategies.",
-      mockUI: (
-        <div style={{ padding: 20 }}>
-          {/* Mini IPS Form mock */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: T.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#fff", fontWeight: 700 }}>iF</div>
-            <div style={{ fontSize: 12, color: T.textSoft }}>initFarm Agent</div>
-          </div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, marginBottom: 12 }}>STEP 1 of 4</div>
-          {["Return Objective", "Max Drawdown", "Time Horizon", "Lock-up Tolerance"].map((label, i) => (
-            <div key={i} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, color: T.textMuted, marginBottom: 4 }}>{label}</div>
-              <div style={{
-                padding: "10px 14px", borderRadius: 8,
-                border: `1.5px solid ${T.green}`, background: T.greenSoft,
-                fontSize: 12, fontWeight: 500, color: T.text,
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-              }}>
-                <span>{["Balanced — 8~15% APY", "Low Risk — Up to -10%", "Medium-term — 3~12 months", "Short — Up to 7 days"][i]}</span>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={T.green} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-            </div>
-          ))}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T.green} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span style={{ fontSize: 11, fontWeight: 600, color: T.green }}>Submitted</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      num: "02",
-      title: "Review Your Portfolio",
-      description: "Our AI engine constructs an optimized portfolio with pie chart visualization, risk grades, and blended APY — all backed by verified on-chain data.",
-      mockUI: (
-        <div style={{ padding: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: T.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: "#fff", fontWeight: 700 }}>iF</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: T.text }}>IPS Analysis Complete</div>
-          </div>
-          {/* Mini pie chart */}
-          <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 16 }}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="8" />
-              <circle cx="40" cy="40" r="36" fill="none" stroke={T.text} strokeWidth="8" strokeDasharray="68 158" strokeDashoffset="0" transform="rotate(-90 40 40)" />
-              <circle cx="40" cy="40" r="36" fill="none" stroke={T.green} strokeWidth="8" strokeDasharray="68 158" strokeDashoffset="-68" transform="rotate(-90 40 40)" />
-              <circle cx="40" cy="40" r="36" fill="none" stroke="#3B82F6" strokeWidth="8" strokeDasharray="56 170" strokeDashoffset="-136" transform="rotate(-90 40 40)" />
-              <circle cx="40" cy="40" r="36" fill="none" stroke="#F97316" strokeWidth="8" strokeDasharray="34 192" strokeDashoffset="-192" transform="rotate(-90 40 40)" />
-            </svg>
-            <div style={{ flex: 1 }}>
-              {[
-                { name: "Lido ETH", pct: "30%", color: T.text },
-                { name: "Sky USD", pct: "30%", color: T.green },
-                { name: "Aave ETH", pct: "25%", color: "#3B82F6" },
-                { name: "Binance ETH", pct: "15%", color: "#F97316" },
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: 2, background: item.color }} />
-                  <span style={{ fontSize: 11, color: T.text, flex: 1 }}>{item.name}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600 }}>{item.pct}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Summary row */}
-          <div style={{ display: "flex", gap: 12, background: T.bgWarm, borderRadius: 8, padding: "10px 12px" }}>
-            <div>
-              <div style={{ fontSize: 9, color: T.textMuted }}>Blended APY</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: T.green }}>2.62%</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 9, color: T.textMuted }}>Risk Grade</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>A</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 9, color: T.textMuted }}>Max DD</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>-3.5%</div>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      num: "03",
-      title: "Deposit & Earn",
-      description: "Connect your wallet, choose your deposit amount, and see projected earnings in real-time. One click to execute — your funds are allocated across the portfolio instantly.",
-      mockUI: (
-        <div style={{ padding: 20 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: T.text, marginBottom: 12 }}>Deposit to initFarm Vault</div>
-          {/* Amount input */}
-          <div style={{
-            display: "flex", alignItems: "center",
-            border: `2px solid ${T.green}`, borderRadius: 8, padding: "8px 12px", marginBottom: 12,
-          }}>
-            <span style={{ fontSize: 18, fontWeight: 700, color: T.text, flex: 1 }}>1.0</span>
-            <span style={{ fontSize: 12, color: T.textMuted, fontWeight: 600 }}>INIT</span>
-          </div>
-          {/* Preset buttons */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-            {["0.1", "0.5", "1", "5"].map((v, i) => (
-              <div key={i} style={{
-                flex: 1, padding: "5px 0", borderRadius: 6, textAlign: "center",
-                fontSize: 10, fontWeight: 600,
-                border: `1px solid ${v === "1" ? T.green : T.cardBorder}`,
-                background: v === "1" ? T.greenSoft : "transparent",
-                color: v === "1" ? T.green : T.textSoft,
-              }}>{v} INIT</div>
-            ))}
-          </div>
-          {/* Projected */}
-          <div style={{ fontSize: 10, fontWeight: 600, color: T.textMuted, marginBottom: 6 }}>Projected Earnings</div>
-          {[
-            { period: "1 Month", earn: "+0.0022" },
-            { period: "3 Months", earn: "+0.0066" },
-            { period: "1 Year", earn: "+0.0262" },
-          ].map((r, i) => (
-            <div key={i} style={{
-              display: "flex", justifyContent: "space-between", padding: "6px 10px",
-              background: i % 2 === 0 ? T.bgWarm : "transparent", borderRadius: 6, marginBottom: 2,
-            }}>
-              <span style={{ fontSize: 11, color: T.text }}>{r.period}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: T.green }}>{r.earn} INIT</span>
-            </div>
-          ))}
-          {/* Deposit button */}
-          <div style={{
-            marginTop: 12, padding: "10px 0", borderRadius: 8,
-            background: T.green, textAlign: "center",
-            fontSize: 12, fontWeight: 600, color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-          }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            Deposit 1.0 INIT
-          </div>
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <section ref={sectionRef} style={{ padding: "120px 48px", background: T.bg, position: "relative", overflow: "hidden" }}>
-      {/* Background decoration */}
-      <div style={{
-        position: "absolute", top: 80, right: -100, width: 500, height: 500,
-        borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.03) 0%, transparent 70%)",
-        pointerEvents: "none",
-      }} />
-
-      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 80 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>How to Use</p>
-          <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 16px" }}>Three steps to smarter yield</h2>
-          <p style={{ fontSize: 15, color: T.textSoft, lineHeight: 1.7, margin: "0 auto", maxWidth: 520 }}>
-            From defining your strategy to earning yield — initFarm guides you through every step with AI-powered precision.
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 100 }}>
-          {howSteps.map((step, i) => {
-            const isVisible = visibleSteps.has(i);
-            const isLeft = i % 2 === 0;
-            return (
-              <div key={i} data-step={i} style={{
-                display: "flex", gap: 60, alignItems: "center",
-                flexDirection: isLeft ? "row" : "row-reverse",
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? "translateY(0)" : `translateY(40px)`,
-                transition: "all 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
-              }}>
-                {/* Text side */}
-                <div style={{ flex: 1 }}>
-                  <div style={{
-                    display: "inline-flex", alignItems: "center", gap: 10,
-                    marginBottom: 20,
-                  }}>
-                    <div style={{
-                      width: 48, height: 48, borderRadius: 14,
-                      background: i === activeStep ? T.text : T.bgWarm,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 18, fontWeight: 700,
-                      color: i === activeStep ? "#fff" : T.textMuted,
-                      transition: "all 0.4s ease",
-                      border: i === activeStep ? "none" : `1px solid ${T.cardBorder}`,
-                    }}>{step.num}</div>
-                    {/* Connection line */}
-                    {i < howSteps.length - 1 && (
-                      <div style={{
-                        position: "absolute", left: isLeft ? 72 : "auto", right: isLeft ? "auto" : 72,
-                        top: "100%", width: 2, height: 100,
-                        background: `linear-gradient(to bottom, ${T.cardBorder}, transparent)`,
-                      }} />
-                    )}
-                  </div>
-                  <h3 style={{
-                    fontSize: 28, fontWeight: 600, color: T.text,
-                    margin: "0 0 14px", letterSpacing: "-0.5px",
-                  }}>{step.title}</h3>
-                  <p style={{
-                    fontSize: 15, color: T.textSoft, lineHeight: 1.8, margin: 0, maxWidth: 420,
-                  }}>{step.description}</p>
-                </div>
-
-                {/* Mock UI card */}
-                <div style={{
-                  flex: 1, maxWidth: 380,
-                  background: T.card, borderRadius: 20,
-                  border: `1px solid ${T.cardBorder}`,
-                  boxShadow: isVisible
-                    ? "0 20px 60px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)"
-                    : "0 4px 12px rgba(0,0,0,0.02)",
-                  overflow: "hidden",
-                  transition: "box-shadow 0.7s ease",
-                  transform: isVisible
-                    ? "rotate(0deg)"
-                    : `rotate(${isLeft ? "2" : "-2"}deg)`,
-                  transitionProperty: "box-shadow, transform",
-                }}>
-                  {/* Browser chrome */}
-                  <div style={{
-                    padding: "10px 14px", borderBottom: `1px solid ${T.cardBorder}`,
-                    display: "flex", alignItems: "center", gap: 6,
-                  }}>
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF5F56" }} />
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FFBD2E" }} />
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#27C93F" }} />
-                    <div style={{
-                      flex: 1, marginLeft: 8, padding: "4px 12px", borderRadius: 6,
-                      background: T.bgWarm, fontSize: 10, color: T.textMuted, textAlign: "center",
-                    }}>initfarm.app/chat</div>
-                  </div>
-                  {step.mockUI}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom CTA */}
-        <div style={{
-          textAlign: "center", marginTop: 80,
-          opacity: visibleSteps.has(2) ? 1 : 0,
-          transform: visibleSteps.has(2) ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.6s ease 0.3s",
-        }}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "10px 20px", borderRadius: 100,
-            background: T.bgWarm, border: `1px solid ${T.cardBorder}`,
-            fontSize: 13, color: T.textSoft, fontWeight: 500,
-          }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.green, animation: "dotPulse 2s infinite" }} />
-            Takes less than 2 minutes to set up
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes dotPulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.5); }
-        }
-      `}</style>
-    </section>
-  );
-}
-
 /* ─── Pricing ─── */
 function Pricing() {
   return (
@@ -1645,7 +1341,7 @@ function Pricing() {
       padding: "120px 48px", background: T.bg, position: "relative",
     }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 72 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "1.5px", marginBottom: 12 }}>Fee Structure</p>
           <h2 style={{ fontSize: 36, fontWeight: 600, color: T.text, letterSpacing: "-1px", margin: "0 0 14px" }}>Aligned with your returns</h2>
           <p style={{ fontSize: 15, color: T.textSoft, lineHeight: 1.7, margin: 0 }}>
@@ -1653,27 +1349,8 @@ function Pricing() {
           </p>
         </div>
 
-        {/* ── Pay As You Consume notice ── */}
-        <div style={{
-          padding: "20px 28px", borderRadius: 12, marginBottom: 24,
-          background: T.bgWarm, border: "1px solid rgba(0,0,0,0.04)",
-          display: "flex", alignItems: "center", gap: 16,
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.04)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <p style={{ fontSize: 13, color: T.textSoft, lineHeight: 1.6, margin: 0 }}>
-            Each AI chat interaction consumes LLM tokens, paid in <span style={{ fontWeight: 600, color: T.text }}>INIT</span>. One message, one transaction — no subscriptions, no hidden costs.
-          </p>
-        </div>
-
         {/* ── Fee Cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 48 }}>
           <div style={{
             padding: "40px 36px", borderRadius: T.radiusLg,
             background: T.bgWarm, position: "relative", overflow: "hidden",
@@ -1956,16 +1633,135 @@ function Footer() {
           display: "flex", alignItems: "flex-end", justifyContent: "center",
         }}>
           <span style={{
-            fontSize: "clamp(120px, 18vw, 240px)", fontWeight: 700, color: "rgba(26,26,26,0.18)",
-            letterSpacing: "0.02em", lineHeight: 0.85, userSelect: "none",
+            fontSize: "clamp(120px, 18vw, 240px)", fontWeight: 700, color: T.text,
+            letterSpacing: "-0.06em", lineHeight: 0.85, userSelect: "none",
           }}>init</span>
           <span style={{
-            fontSize: "clamp(120px, 18vw, 240px)", fontWeight: 300, color: "rgba(26,26,26,0.18)",
-            letterSpacing: "0.02em", lineHeight: 0.85, userSelect: "none",
+            fontSize: "clamp(120px, 18vw, 240px)", fontWeight: 300, color: T.text,
+            letterSpacing: "-0.06em", lineHeight: 0.85, userSelect: "none",
           }}>Farm</span>
 
+          {/* Mining mascot - SVG character with pickaxe animation */}
+          <div style={{
+            marginLeft: "clamp(-4px, -0.3vw, 0px)",
+            marginBottom: "clamp(6px, 1.2vw, 16px)",
+            width: "clamp(90px, 11vw, 150px)", height: "clamp(90px, 11vw, 150px)",
+            flexShrink: 0,
+          }}>
+            <svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg"
+              style={{ width: "100%", height: "100%", overflow: "visible" }}>
+              {/* Shadow */}
+              <ellipse cx="65" cy="128" rx="30" ry="5" fill="rgba(0,0,0,0.06)" />
+
+              {/* Whole body bounces */}
+              <g style={{ animation: "miningBounce 1.6s ease-in-out infinite" }}>
+                {/* Legs */}
+                <rect x="50" y="100" width="10" height="14" rx="5" fill="#E8E3DA" stroke="#C5BFB5" strokeWidth="1"/>
+                <rect x="68" y="100" width="10" height="14" rx="5" fill="#E8E3DA" stroke="#C5BFB5" strokeWidth="1"/>
+
+                {/* Body - overalls */}
+                <rect x="42" y="65" width="44" height="40" rx="14" fill="#E8E3DA" stroke="#C5BFB5" strokeWidth="1.2"/>
+                {/* Overall strap lines */}
+                <line x1="54" y1="68" x2="54" y2="80" stroke="#C5BFB5" strokeWidth="1" strokeLinecap="round"/>
+                <line x1="74" y1="68" x2="74" y2="80" stroke="#C5BFB5" strokeWidth="1" strokeLinecap="round"/>
+                {/* Pocket */}
+                <rect x="56" y="85" width="16" height="10" rx="3" fill="none" stroke="#C5BFB5" strokeWidth="0.8"/>
+
+                {/* Left arm - holds steady */}
+                <g>
+                  <rect x="28" y="74" width="16" height="8" rx="4" fill="#E8E3DA" stroke="#C5BFB5" strokeWidth="1"/>
+                  {/* Left hand */}
+                  <circle cx="28" cy="78" r="5" fill="#FFF" stroke="#C5BFB5" strokeWidth="1"/>
+                </g>
+
+                {/* Right arm + pickaxe - swings! */}
+                <g style={{ transformOrigin: "86px 74px", animation: "armSwing 1.6s ease-in-out infinite" }}>
+                  <rect x="84" y="74" width="16" height="8" rx="4" fill="#E8E3DA" stroke="#C5BFB5" strokeWidth="1"/>
+                  {/* Right hand */}
+                  <circle cx="100" cy="78" r="5" fill="#FFF" stroke="#C5BFB5" strokeWidth="1"/>
+                  {/* Pickaxe handle */}
+                  <line x1="100" y1="74" x2="124" y2="38" stroke="#A0896C" strokeWidth="3" strokeLinecap="round"/>
+                  {/* Pickaxe head */}
+                  <path d="M120 42 L132 28 L128 38 L136 32 L126 46" fill="#9E9E9E" stroke="#757575" strokeWidth="1" strokeLinejoin="round"/>
+                  {/* Impact sparkles - only visible at swing bottom */}
+                  <g style={{ animation: "sparkleFlash 1.6s ease-in-out infinite" }}>
+                    <line x1="130" y1="26" x2="134" y2="22" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="136" y1="30" x2="140" y2="28" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="128" y1="34" x2="132" y2="34" stroke="#F59E0B" strokeWidth="1" strokeLinecap="round"/>
+                  </g>
+                </g>
+
+                {/* Head */}
+                <circle cx="64" cy="48" r="24" fill="#FFF" stroke="#D5D0C8" strokeWidth="1.5"/>
+                {/* Inner face area */}
+                <circle cx="64" cy="50" r="18" fill="#FFF"/>
+
+                {/* Eyes - blink animation */}
+                <g style={{ animation: "blink 4s ease-in-out infinite" }}>
+                  <circle cx="55" cy="48" r="3" fill={T.text}/>
+                  <circle cx="73" cy="48" r="3" fill={T.text}/>
+                  {/* Eye shine */}
+                  <circle cx="56.5" cy="46.5" r="1" fill="#FFF"/>
+                  <circle cx="74.5" cy="46.5" r="1" fill="#FFF"/>
+                </g>
+
+                {/* Smile */}
+                <path d="M57 55 Q64 61 71 55" stroke={T.text} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                {/* Cheek blush */}
+                <ellipse cx="49" cy="54" rx="4" ry="2.5" fill="#F5D5B5" opacity="0.45"/>
+                <ellipse cx="79" cy="54" rx="4" ry="2.5" fill="#F5D5B5" opacity="0.45"/>
+
+                {/* Straw hat */}
+                <ellipse cx="64" cy="32" rx="30" ry="8" fill="#D4A854" stroke="#C49A48" strokeWidth="1"/>
+                <path d="M48 32 Q50 14 64 12 Q78 14 80 32" fill="#E8C36A" stroke="#C49A48" strokeWidth="1"/>
+                {/* Hat crosshatch pattern */}
+                <line x1="54" y1="18" x2="58" y2="30" stroke="#C49A48" strokeWidth="0.5" opacity="0.4"/>
+                <line x1="64" y1="14" x2="64" y2="30" stroke="#C49A48" strokeWidth="0.5" opacity="0.4"/>
+                <line x1="74" y1="18" x2="70" y2="30" stroke="#C49A48" strokeWidth="0.5" opacity="0.4"/>
+                <line x1="50" y1="22" x2="78" y2="22" stroke="#C49A48" strokeWidth="0.5" opacity="0.3"/>
+                {/* Hat band */}
+                <rect x="48" y="28" width="32" height="5" rx="2.5" fill="#C49A48" opacity="0.5"/>
+
+                {/* Sprout on hat */}
+                <g style={{ animation: "sproutWiggle 3s ease-in-out infinite" }}>
+                  <path d="M64 12 Q62 5 58 2" stroke="#7CB342" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                  <ellipse cx="56" cy="2" rx="5" ry="3.5" fill="#8BC34A" transform="rotate(-15 56 2)"/>
+                  <path d="M64 12 Q66 5 70 3" stroke="#7CB342" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                  <ellipse cx="72" cy="3" rx="5" ry="3.5" fill="#8BC34A" transform="rotate(15 72 3)"/>
+                </g>
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes armSwing {
+          0%, 100% { transform: rotate(0deg); }
+          20% { transform: rotate(-40deg); }
+          40% { transform: rotate(-40deg); }
+          60% { transform: rotate(8deg); }
+        }
+        @keyframes miningBounce {
+          0%, 100% { transform: translateY(0); }
+          20% { transform: translateY(-3px); }
+          55% { transform: translateY(2px); }
+          60% { transform: translateY(0); }
+        }
+        @keyframes sparkleFlash {
+          0%, 50%, 100% { opacity: 0; }
+          55%, 70% { opacity: 1; }
+        }
+        @keyframes blink {
+          0%, 42%, 46%, 100% { transform: scaleY(1); }
+          44% { transform: scaleY(0.1); }
+        }
+        @keyframes sproutWiggle {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(5deg); }
+          75% { transform: rotate(-5deg); }
+        }
+      `}</style>
     </footer>
   );
 }
@@ -2182,11 +1978,8 @@ function ChatPanel({ onClose }) {
 
 /* InterwovenKitProvider is in src/main.jsx — App is already wrapped */
 export default function App() {
-  const navigate = useNavigate();
+  const [chat, setChat] = useState(false);
   const kit = useInterwovenKit();
-
-  /* Navigate to full chat page */
-  const handleDemo = () => navigate("/chat");
 
   /* Connect/Wallet 버튼 → InterwovenKit 네이티브 UI 직접 호출 */
   const handleWallet = () => {
@@ -2229,24 +2022,17 @@ export default function App() {
         .pill-link:hover { background: rgba(0,0,0,0.05) !important; color: ${T.text} !important; }
         .pill-btn-primary:hover { background: #333 !important; transform: translateY(-0.5px); box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important; }
         .pill-btn-wallet:hover { background: rgba(245,243,238,0.9) !important; border-color: rgba(0,0,0,0.1) !important; }
-        /* Mascot 6-frame animation - each frame visible for 0.5s in a 3s cycle */
-        @keyframes frameFade1 { 0%,100%{opacity:1} 16.66%{opacity:1} 16.67%{opacity:0} 99.99%{opacity:0} }
-        @keyframes frameFade2 { 0%{opacity:0} 16.66%{opacity:0} 16.67%{opacity:1} 33.33%{opacity:1} 33.34%{opacity:0} }
-        @keyframes frameFade3 { 0%{opacity:0} 33.33%{opacity:0} 33.34%{opacity:1} 50%{opacity:1} 50.01%{opacity:0} }
-        @keyframes frameFade4 { 0%{opacity:0} 50%{opacity:0} 50.01%{opacity:1} 66.66%{opacity:1} 66.67%{opacity:0} }
-        @keyframes frameFade5 { 0%{opacity:0} 66.66%{opacity:0} 66.67%{opacity:1} 83.33%{opacity:1} 83.34%{opacity:0} }
-        @keyframes frameFade6 { 0%{opacity:0} 83.33%{opacity:0} 83.34%{opacity:1} 99.99%{opacity:1} 100%{opacity:0} }
       `}</style>
-      <Navbar onDemo={handleDemo} onWallet={handleWallet} />
-      <Hero onDemo={handleDemo} onWallet={handleWallet} />
+      <Navbar onDemo={() => setChat(true)} onWallet={handleWallet} />
+      <Hero onDemo={() => setChat(true)} onWallet={handleWallet} />
       <PoolTable />
       <YieldComparison />
       <Features />
       <Process />
-      <HowToUse />
       <Pricing />
-      <CTA onDemo={handleDemo} />
+      <CTA onDemo={() => setChat(true)} />
       <Footer />
+      {chat && <ChatPanel onClose={() => setChat(false)} />}
     </div>
   );
 }

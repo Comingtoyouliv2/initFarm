@@ -19,20 +19,24 @@ initFarm introduces a transparent yield verification engine:
 3. **Quantify** -- Calculate `Risk(delta) = Nominal APY - Own APY` to measure the risk premium. Score every protocol across all six risk parameters with weighted analysis.
 4. **Construct** -- The AI agent assembles a portfolio matching your investment policy, balancing target yields with acceptable risk levels and lock-up preferences.
 
-## 6-Factor Risk Model
+## APY Verification
 
-Every protocol is scored across:
+initFarm independently verifies every protocol's yield using real-time on-chain data from DeFiLlama, Dune Analytics, and StakingRewards. Each yield is decomposed into primitives (rebase, fee sharing, lending interest, reward distribution) to compute a true APY, then compared against the advertised rate to measure the risk premium: `Risk(delta) = Nominal APY - Verified APY`.
 
-| Factor | What it measures |
+### Multi-Factor Risk Model
+
+Every protocol is scored across six on-chain factors:
+
+| Factor | Data Source |
 |---|---|
-| TVL Stability | Size, trend, and concentration (Herfindahl Index) |
-| APY Consistency | Historical volatility and 30/90-day deviation |
-| Revenue Coverage | What portion of yield is backed by actual protocol revenue |
-| Whale Concentration | Top-wallet share and exit risk |
+| TVL Stability | Real-time TVL size, trend, and concentration (Herfindahl Index) |
+| APY Consistency | Historical volatility and 30/90-day deviation from mean |
+| Revenue Coverage | On-chain fee revenue vs. yield payout ratio |
+| Whale Concentration | Top-wallet share and exit risk from holder distribution |
 | Token Price Trend | 30d/90d price momentum and daily volatility |
-| Lock-up Risk | Unbonding period and liquidity constraints |
+| Lock-up Risk | Unbonding period, withdrawal delay, and liquidity depth |
 
-Combined into a single risk grade: **A** (Lowest) through **D** (High).
+Each factor produces a weighted score, combined into a single risk grade: **A** (Lowest) through **D** (High).
 
 ## Pool Coverage
 
@@ -137,16 +141,14 @@ Chat with the initFarm AI agent to:
 - Verify APY sustainability with on-chain evidence
 - Explore Initia ecosystem staking opportunities
 
-## Pricing
+## Fee Structure
 
-All payments converted as iUSD (Initia stablecoin).
+No subscriptions. We earn only when you earn. All fees are settled in iUSD (Initia stablecoin).
 
-| Plan | Price | Highlights |
+| Fee | Rate | Description |
 |---|---|---|
-| Explorer | Free | Pool table, basic verification, 3 AI chats/day |
-| Starter | $9.90/mo | Unlimited AI chat, 1 portfolio, risk delta monitoring |
-| Pro | $29/mo | 5 portfolios, whale alerts, backtesting, priority support |
-| Institutional | $99/mo | Unlimited portfolios, API access, on-chain audit reports |
+| Management Fee | 1.0% | of AUM per year |
+| Performance Fee | 10% | of net profits (above high-water mark) |
 
 ## Team
 

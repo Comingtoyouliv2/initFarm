@@ -1,5 +1,6 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import {
 } from "@initia/interwovenkit-react";
 import css from "@initia/interwovenkit-react/styles.css?inline";
 import App from "./App.jsx";
+import ChatPage from "./ChatPage.jsx";
 
 /* ─── Inject InterwovenKit styles ─── */
 injectStyles(css);
@@ -38,9 +40,18 @@ createRoot(document.getElementById("root")).render(
               "/cosmos.bank.v1beta1.MsgSend",
               "/initia.move.v1.MsgExecute",
             ],
+            "initiation-2": [
+              "/cosmos.bank.v1beta1.MsgSend",
+              "/initia.move.v1.MsgExecute",
+            ],
           }}
         >
-          <App />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/chat" element={<ChatPage />} />
+            </Routes>
+          </BrowserRouter>
         </InterwovenKitProvider>
       </WagmiProvider>
     </QueryClientProvider>
