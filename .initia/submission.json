@@ -1,0 +1,31 @@
+{
+  "project_name": "initFarm",
+  "track": "DeFi",
+  "tagline": "AI-powered DeFi yield farming portfolio engine with on-chain APY verification",
+  "description": "initFarm analyzes DeFi protocols using on-chain data to verify APY claims, quantify risk with a 6-factor model, and construct optimized portfolios. It uses InterwovenKit for wallet connection and Initia-native features including Auto-Sign sessions and .init username support.",
+  "team": [
+    {
+      "name": "Wonjae",
+      "email": "comingtoyouliv2@gmail.com",
+      "role": "Builder"
+    }
+  ],
+  "tech_stack": {
+    "frontend": "React (JSX)",
+    "wallet": "@initia/interwovenkit-react",
+    "deployment": "Vercel",
+    "chain": "Initia (interwoven-1)"
+  },
+  "initia_features": [
+    "InterwovenKit wallet connection (Privy social login, MetaMask, Keplr)",
+    "Auto-Sign Session UX",
+    "Initia Usernames (.init)"
+  ],
+  "links": {
+    "repo": "",
+    "demo": "",
+    "video": "",
+    "contract_deployment": "https://testnet.scan.initia.xyz/tx/361C29A465E8DD2AC2CBEF1FB7A546FC3BB1B76F06B0C338FD134D7595544E26"
+  },
+  "chain_id": "initiation-2"
+}

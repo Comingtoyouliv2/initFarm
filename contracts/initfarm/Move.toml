@@ -1,0 +1,11 @@
+[package]
+name = "initfarm"
+version = "0.1.0"
+
+[dependencies]
+InitiaStdlib = { git = "https://github.com/initia-labs/move-natives.git", subdir = "initia_stdlib", rev = "main" }
+
+[addresses]
+std = "0x1"
+initia_std = "0x1"
+initfarm = "0x070bac898a36d6e48824bf0223ff9ee5068a6956"

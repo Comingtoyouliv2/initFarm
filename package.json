@@ -1,0 +1,25 @@
+{
+  "name": "initfarm",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@initia/interwovenkit-react": "^2.8.0",
+    "@initia/utils": "2.0.0",
+    "@tanstack/react-query": "^5.90.7",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.38.6",
+    "wagmi": "2.17.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react-swc": "^4.2.1",
+    "vite": "^7.2.2",
+    "vite-plugin-node-polyfills": "^0.24.0"
+  }
+}
