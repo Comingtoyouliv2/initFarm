@@ -24,4 +24,4 @@ React + Vite | InterwovenKit | Move (Initia) | Vercel
 
 ## Team
 
-Wonjae — Builder
+Noah — Builder
