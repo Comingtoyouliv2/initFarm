@@ -14,7 +14,7 @@
     "frontend": "React (JSX)",
     "wallet": "@initia/interwovenkit-react",
     "deployment": "Vercel",
-    "chain": "Initia (interwoven-1)"
+    "chain": "Initia (initiation-2)"
   },
   "initia_features": [
     "InterwovenKit wallet connection (Privy social login, MetaMask, Keplr)",
@@ -22,10 +22,10 @@
     "Initia Usernames (.init)"
   ],
   "links": {
-    "repo": "",
+    "repo": "https://github.com/Comingtoyouliv2/initFarm",
     "demo": "",
     "video": "",
-    "contract_deployment": "https://testnet.scan.initia.xyz/tx/361C29A465E8DD2AC2CBEF1FB7A546FC3BB1B76F06B0C338FD134D7595544E26"
+    "contract_deployment": "https://scan.testnet.initia.xyz/initiation-2/txs/D05C54B9B134215293FFC2F8A19323AB3D4D8971C736FA99038E9B30B5E8E8BD"
   },
   "chain_id": "initiation-2"
 }
