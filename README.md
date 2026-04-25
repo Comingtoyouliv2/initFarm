@@ -16,7 +16,7 @@ Users define goals through conversational IPS flow. The AI verifies APY using on
 ## Deployment
 
 - Chain: `initiation-2`
-- Contract: [`361C29A4...544E26`](https://testnet.scan.initia.xyz/tx/361C29A465E8DD2AC2CBEF1FB7A546FC3BB1B76F06B0C338FD134D7595544E26)
+- Contract: https://scan.testnet.initia.xyz/initiation-2/txs/D05C54B9B134215293FFC2F8A19323AB3D4D8971C736FA99038E9B30B5E8E8BD
 
 ## Stack
 
